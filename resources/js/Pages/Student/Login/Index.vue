@@ -12,7 +12,6 @@
                     {{ $page.props.session.error }}
                 </div>
                 <form @submit.prevent="submit" class="mt-4">
-
                     <div class="form-group mb-4">
                         <label for="email">Nomor Test</label>
                         <div class="input-group">
@@ -49,11 +48,14 @@
                                 </label>
                             </div>
                         </div>
-
                     </div>
                     
-                    <div class="d-grid">
+                    <div class="d-grid mb-3">
                         <button type="submit" class="btn btn-gray-800">LOGIN</button>
+                    </div>
+
+                    <div class="text-center">
+                        <p>Belum punya akun? <Link href="/register" class="text-primary">Daftar Sekarang</Link></p>
                     </div>
                 </form>
             </div>
@@ -67,7 +69,8 @@
 
     //import Head from Inertia
     import {
-        Head
+        Head,
+        Link
     } from '@inertiajs/inertia-vue3';
 
     //import reactive
@@ -81,13 +84,13 @@
     } from '@inertiajs/inertia';
 
     export default {
-
         //layout
         layout: LayoutStudent,
 
         //register component
         components: {
-            Head
+            Head,
+            Link
         },
 
         //props
@@ -97,7 +100,6 @@
 
         //inisialisasi composition API
         setup() {
-
             //define form state
             const form = reactive({
                 nisn: '',
@@ -106,10 +108,8 @@
 
             //submit method
             const submit = () => {
-
                 //send data to server
                 Inertia.post('/students/login', {
-
                     //data
                     nisn: form.nisn,
                     password: form.password,
@@ -122,11 +122,8 @@
                 submit
             }
         }
-
     }
-
 </script>
 
 <style>
-
 </style>

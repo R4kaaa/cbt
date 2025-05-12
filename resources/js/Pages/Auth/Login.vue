@@ -1,10 +1,10 @@
 <template>
     <Head>
-        <title>Login GURU - Aplikasi Ujian Online</title>
+        <title>Login ADMIN - Aplikasi Ujian Online</title>
     </Head>
     <div class="bg-white shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500">
         <div class="text-center text-md-center mb-4 mt-md-0">
-            <h3>GURU KELAS 5 MIJAS</h3>
+            <h3>ADMIN LES</h3>
         </div>
         <form @submit.prevent="submit" class="mt-4">
             <div class="form-group mb-4">

@@ -33,7 +33,7 @@
                             <span class="sidebar-text fw-bold">UJIAN ONLINE</span>
                         </span>
                         <span>
-                            <span class="badge badge-sm bg-secondary ms-1 text-gray-800">PRO</span>
+                            <span class="badge badge-sm bg-secondary ms-1 text-gray-800">ADMIN</span>
                         </span>
                     </span>
                 </li>

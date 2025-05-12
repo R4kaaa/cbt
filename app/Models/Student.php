@@ -18,9 +18,11 @@ class Student extends Authenticatable
         'classroom_id',
         'nisn',
         'name',
+        'email',
+        'phone',
         'password',
         'gender'
-    ];  
+    ];
 
     /**
      * classroom

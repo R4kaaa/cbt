@@ -15,8 +15,8 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-4">
-                                        <label>Nisn</label> 
-                                        <input type="text" class="form-control" placeholder="Masukkan Nisn Siswa" v-model="form.nisn">
+                                        <label>NIK</label> 
+                                        <input type="text" class="form-control" placeholder="Masukkan NIK Peserta" v-model="form.nisn">
                                         <div v-if="errors.nisn" class="alert alert-danger mt-2">
                                             {{ errors.nisn }}
                                         </div>
@@ -28,6 +28,27 @@
                                         <input type="text" class="form-control" placeholder="Masukkan Nama Siswa" v-model="form.name">
                                         <div v-if="errors.name" class="alert alert-danger mt-2">
                                             {{ errors.name }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label>Email</label> 
+                                        <input type="email" class="form-control" placeholder="Masukkan Email Siswa" v-model="form.email">
+                                        <div v-if="errors.email" class="alert alert-danger mt-2">
+                                            {{ errors.email }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label>Nomor Telepon</label> 
+                                        <input type="text" class="form-control" placeholder="Masukkan Nomor Telepon" v-model="form.phone">
+                                        <div v-if="errors.phone" class="alert alert-danger mt-2">
+                                            {{ errors.phone }}
                                         </div>
                                     </div>
                                 </div>
@@ -132,6 +153,8 @@
             const form = reactive({
                 nisn: props.student.nisn,
                 name: props.student.name,
+                email: props.student.email,
+                phone: props.student.phone,
                 classroom_id: props.student.classroom_id,
                 gender: props.student.gender,
                 password: '',
@@ -146,6 +169,8 @@
                     //data
                     nisn: form.nisn,
                     name: form.name,
+                    email: form.email,
+                    phone: form.phone,
                     classroom_id: form.classroom_id,
                     gender: form.gender,
                     password: form.password,
@@ -160,11 +185,12 @@
                             showConfirmButton: false,
                             timer: 2000
                         });
-                    },
+                    }, 
                 });
 
             }
 
+            //return
             return {
                 form,
                 submit,

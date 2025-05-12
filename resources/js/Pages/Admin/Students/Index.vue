@@ -43,11 +43,12 @@
                                 <thead class="thead-dark">
                                     <tr class="border-0">
                                         <th class="border-0 rounded-start" style="width:5%">No.</th>
-                                        <th class="border-0">Nisn</th>
+                                        <th class="border-0">NIK</th>
                                         <th class="border-0">Nama</th>
+                                        <th class="border-0">Email</th>
+                                        <th class="border-0">Telepon</th>
                                         <th class="border-0">Kelas</th>
                                         <th class="border-0">Jenis Kelamin</th>
-                                        <th class="border-0">Password</th>
                                         <th class="border-0 rounded-end" style="width:15%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -58,9 +59,10 @@
                                             {{ ++index + (students.current_page - 1) * students.per_page }}</td>
                                         <td>{{ student.nisn }}</td>
                                         <td>{{ student.name }}</td>
+                                        <td>{{ student.email }}</td>
+                                        <td>{{ student.phone }}</td>
                                         <td class="text-center">{{ student.classroom.title }}</td>
                                         <td class="text-center">{{ student.gender }}</td>
-                                        <td>{{ student.password }}</td>
                                         <td class="text-center">
                                             <Link :href="`/admin/students/${student.id}/edit`" class="btn btn-sm btn-info border-0 shadow me-2" type="button"><i class="fa fa-pencil-alt"></i></Link>
                                             <button @click.prevent="destroy(student.id)" class="btn btn-sm btn-danger border-0"><i class="fa fa-trash"></i></button>
