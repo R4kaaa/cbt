@@ -293,10 +293,9 @@ class ExamController extends Controller
         // Persiapan pesan WhatsApp
         $student = auth()->guard('student')->user();
         $exam_group = ExamGroup::with('exam.lesson')->find($request->exam_group_id);
-
         $message = "*Hasil Ujian*\n\n"
             . "*Nama Siswa*: " . $student->name . "\n"
-            . "*Mata Pelajaran*: " . $exam_group->exam->lesson->name . "\n"
+            . "*Mata Pelajaran*: " . $exam_group->exam->title . "\n"
             . "*Jumlah Soal*: " . $count_question . "\n"
             . "*Jawaban Benar*: " . $count_correct_answer . "\n"
             . "*Nilai Akhir*: " . $grade_exam . "\n\n"
