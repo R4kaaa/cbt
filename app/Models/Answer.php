@@ -22,7 +22,19 @@ class Answer extends Model
         'question_order',
         'answer_order',
         'answer',
+        'selected_answers', // New field for multiple-choice answers
         'is_correct',
+        'score', // New field for partial credit scoring
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'selected_answers' => 'array',
+        'score' => 'float',
     ];
 
     /**
@@ -33,5 +45,25 @@ class Answer extends Model
     public function question()
     {
         return $this->belongsTo(Question::class);
+    }
+
+    /**
+     * student
+     *
+     * @return void
+     */
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
+
+    /**
+     * exam
+     *
+     * @return void
+     */
+    public function exam()
+    {
+        return $this->belongsTo(Exam::class);
     }
 }

@@ -56,6 +56,7 @@
                                     <tr class="border-0">
                                         <th class="border-0 rounded-start" style="width:5%">No.</th>
                                         <th class="border-0">Soal</th>
+                                        <th class="border-0" style="width:15%">Tipe Soal</th>
                                         <th class="border-0 rounded-end" style="width:15%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -67,12 +68,16 @@
                                             <div class="fw-bold" v-html="question.question"></div>
                                             <hr>
                                             <ol type="A">
-                                                <li v-html="question.option_1" :class="{ 'text-success fw-bold': question.answer == '1' }"></li>
-                                                <li v-html="question.option_2" :class="{ 'text-success fw-bold': question.answer == '2' }"></li>
-                                                <li v-html="question.option_3" :class="{ 'text-success fw-bold': question.answer == '3' }"></li>
-                                                <li v-html="question.option_4" :class="{ 'text-success fw-bold': question.answer == '4' }"></li>
-                                                <li v-html="question.option_5" :class="{ 'text-success fw-bold': question.answer == '5' }"></li>
+                                                <li v-html="question.option_1" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 1 || (question.question_type === 'multiple' && question.answers && question.answers.includes('1')) }"></li>
+                                                <li v-html="question.option_2" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 2 || (question.question_type === 'multiple' && question.answers && question.answers.includes('2')) }"></li>
+                                                <li v-html="question.option_3" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 3 || (question.question_type === 'multiple' && question.answers && question.answers.includes('3')) }"></li>
+                                                <li v-html="question.option_4" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 4 || (question.question_type === 'multiple' && question.answers && question.answers.includes('4')) }"></li>
+                                                <li v-html="question.option_5" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 5 || (question.question_type === 'multiple' && question.answers && question.answers.includes('5')) }"></li>
                                             </ol>
+                                        </td>
+                                        <td class="text-center">
+                                            <span v-if="question.question_type === 'single'" class="badge bg-primary">Jawaban Tunggal</span>
+                                            <span v-else-if="question.question_type === 'multiple'" class="badge bg-success">Jawaban Ganda</span>
                                         </td>
                                         <td class="text-center">
                                             <Link :href="`/admin/exams/${exam.id}/questions/${question.id}/edit`" class="btn btn-sm btn-info border-0 shadow me-2"

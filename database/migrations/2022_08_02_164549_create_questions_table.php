@@ -22,7 +22,9 @@ return new class extends Migration
             $table->text('option_3')->nullable();
             $table->text('option_4')->nullable();
             $table->text('option_5')->nullable();
-            $table->integer('answer');  
+            $table->integer('answer')->nullable();
+            $table->json('answers')->nullable();
+            $table->enum('question_type', ['single', 'multiple'])->default('single');
             $table->timestamps();
         });
     }

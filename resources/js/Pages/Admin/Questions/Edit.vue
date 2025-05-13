@@ -11,6 +11,26 @@
                         <h5><i class="fa fa-question-circle"></i> Edit Soal Ujian</h5>
                         <hr>
                         <form @submit.prevent="submit">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tipe Soal</label>
+                                <div class="d-flex">
+                                    <div class="form-check me-4">
+                                        <input class="form-check-input" type="radio" v-model="form.question_type" value="single" id="single">
+                                        <label class="form-check-label" for="single">
+                                            Jawaban Tunggal
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" v-model="form.question_type" value="multiple" id="multiple">
+                                        <label class="form-check-label" for="multiple">
+                                            Jawaban Ganda
+                                        </label>
+                                    </div>
+                                </div>
+                                <div v-if="errors.question_type" class="mt-2 text-danger">
+                                    {{ errors.question_type }}
+                                </div>
+                            </div>
 
                             <div class="table-responsive mb-4">
                                 <table class="table table-bordered table-centered table-nowrap mb-0 rounded">
@@ -104,7 +124,7 @@
                                                 />
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr v-if="form.question_type === 'single'">
                                             <td style="width:20%" class="fw-bold">Jawaban Benar</td>
                                             <td>
                                                 <select class="form-control" v-model="form.answer">
@@ -114,6 +134,44 @@
                                                     <option value="4">D</option>
                                                     <option value="5">E</option>
                                                 </select>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="form.question_type === 'multiple'">
+                                            <td style="width:20%" class="fw-bold">Jawaban Benar</td>
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="1" id="answer1">
+                                                    <label class="form-check-label" for="answer1">
+                                                        A
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="2" id="answer2">
+                                                    <label class="form-check-label" for="answer2">
+                                                        B
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="3" id="answer3">
+                                                    <label class="form-check-label" for="answer3">
+                                                        C
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="4" id="answer4">
+                                                    <label class="form-check-label" for="answer4">
+                                                        D
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="5" id="answer5">
+                                                    <label class="form-check-label" for="answer5">
+                                                        E
+                                                    </label>
+                                                </div>
+                                                <div v-if="errors.answers" class="mt-2 text-danger">
+                                                    {{ errors.answers }}
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -182,7 +240,9 @@
                 option_3: props.question.option_3,
                 option_4: props.question.option_4,
                 option_5: props.question.option_5,
+                question_type: props.question.question_type || 'single',
                 answer: props.question.answer,
+                answers: props.question.answers || [],
             });
 
             //method "submit"
@@ -197,13 +257,15 @@
                     option_3: form.option_3,
                     option_4: form.option_4,
                     option_5: form.option_5,
-                    answer: form.answer,
+                    question_type: form.question_type,
+                    answer: form.question_type === 'single' ? form.answer : null,
+                    answers: form.question_type === 'multiple' ? form.answers : null,
                 }, {
                     onSuccess: () => {
                         //show success alert
                         Swal.fire({
                             title: 'Success!',
-                            text: 'Soal Ujian Berhasil Dipdate!.',
+                            text: 'Soal Ujian Berhasil Diupdate!.',
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 2000

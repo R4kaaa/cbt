@@ -114,7 +114,9 @@ class ExamController extends Controller
                     'question_order'    => $question_order,
                     'answer_order'      => implode(",", $options),
                     'answer'            => 0,
-                    'is_correct'        => 'N'
+                    'selected_answers'  => json_encode([]), // Untuk multiple choice
+                    'is_correct'        => 'N',
+                    'score'             => 0 // Tambahkan field skor
                 ]);
             }
             $question_order++;
@@ -157,9 +159,12 @@ class ExamController extends Controller
         $question_answered = Answer::with('question')
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('exam_id', $exam_group->exam->id)
-            ->where('answer', '!=', 0)
+            ->where(function ($query) {
+                $query->where('answer', '!=', 0)
+                    ->orWhereNotNull('selected_answers')
+                    ->whereRaw("selected_answers != '[]'");
+            })
             ->count();
-
 
         //get question active
         $question_active = Answer::with('question.exam')
@@ -233,34 +238,90 @@ class ExamController extends Controller
         //get question
         $question = Question::find($request->question_id);
 
-        //cek apakah jawaban sudah benar
-        if ($question->answer == $request->answer) {
-
-            //jawaban benar
-            $result = 'Y';
-        } else {
-
-            //jawaban salah
-            $result = 'N';
-        }
-
-        //get answer
-        $answer   = Answer::where('exam_id', $request->exam_id)
+        //get answer record
+        $answer = Answer::where('exam_id', $request->exam_id)
             ->where('exam_session_id', $request->exam_session_id)
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('question_id', $request->question_id)
             ->first();
 
-        //update jawaban
-        if ($answer) {
-            $answer->answer     = $request->answer;
-            $answer->is_correct = $result;
-            $answer->update();
+        // Periksa tipe soal (single atau multiple) dan validasi jawaban
+        if ($question->question_type === 'single') {
+            // Untuk tipe soal single
+            $is_correct = ($question->answer == $request->answer) ? 'Y' : 'N';
+            $score = ($is_correct === 'Y') ? 1 : 0;
+
+            // Update jawaban untuk tipe single
+            if ($answer) {
+                $answer->answer = $request->answer;
+                $answer->is_correct = $is_correct;
+                $answer->score = $score;
+                $answer->update();
+            }
+        } else {
+            // Untuk tipe soal multiple
+            // Handle selected_answers data type properly
+            $selected_answers = $request->selected_answers;
+            // Check if selected_answers is a string that needs to be decoded
+            if (is_string($selected_answers) && !empty($selected_answers)) {
+                $selected_answers = json_decode($selected_answers, true);
+            }
+
+            // Make sure selected_answers is an array
+            if (!is_array($selected_answers)) {
+                $selected_answers = [];
+            }
+
+            $correct_answers = $question->answers;
+            // Make sure correct_answers is an array
+            if (!is_array($correct_answers)) {
+                $correct_answers = [];
+            }
+
+            // Hitung berapa jawaban yang benar dan salah
+            $user_correct_count = 0;
+
+            // Cek jawaban yang benar dari user
+            foreach ($selected_answers as $selected) {
+                if (in_array($selected, $correct_answers)) {
+                    $user_correct_count++;
+                }
+            }
+
+            // Logika penilaian baru:
+            // Jika semua benar dan tidak ada yang salah: nilai 1
+            // Jika minimal satu jawaban benar: nilai 0.5
+            // Jika tidak ada jawaban yang benar: nilai 0
+
+            $total_correct_options = count($correct_answers);
+            $user_wrong_count = count($selected_answers) - $user_correct_count;
+            $missed_correct_options = $total_correct_options - $user_correct_count;
+
+            if ($user_wrong_count == 0 && $missed_correct_options == 0) {
+                // Semua jawaban benar dan tidak ada yang salah
+                $score = 1;
+                $is_correct = 'Y';
+            } else if ($user_correct_count > 0) {
+                // Minimal ada satu jawaban yang benar
+                $score = 0.5;
+                $is_correct = 'P'; // P untuk partial
+            } else {
+                // Tidak ada jawaban yang benar
+                $score = 0;
+                $is_correct = 'N';
+            }
+
+            // Update jawaban untuk tipe multiple
+            if ($answer) {
+                $answer->selected_answers = json_encode($selected_answers);
+                $answer->is_correct = $is_correct;
+                $answer->score = $score;
+                $answer->update();
+            }
         }
 
         return redirect()->back();
     }
-
     /**
      * endExam
      *
@@ -269,17 +330,33 @@ class ExamController extends Controller
      */
     public function endExam(Request $request)
     {
-        //count jawaban benar
-        $count_correct_answer = Answer::where('exam_id', $request->exam_id)
+        // Get semua jawaban beserta soalnya
+        $answers = Answer::with('question')
+            ->where('exam_id', $request->exam_id)
             ->where('exam_session_id', $request->exam_session_id)
             ->where('student_id', auth()->guard('student')->user()->id)
-            ->where('is_correct', 'Y')
-            ->count();
-        //count jumlah soal
-        $count_question = Question::where('exam_id', $request->exam_id)->count();
-        //hitung nilai
-        $grade_exam = round($count_correct_answer / $count_question * 100, 2);
-        //update nilai di table grades
+            ->get();
+        // dd($answers);
+        // Hitung total skor
+        $total_score = 0;
+        $count_question = $answers->count();
+        $count_correct_answer = 0; // Untuk menghitung pertanyaan yang 100% benar
+
+        foreach ($answers as $answer) {
+            $total_score += $answer->score;
+
+            if ($answer->is_correct === 'Y') {
+                $count_correct_answer++;
+            } elseif ($answer->is_correct === 'P') {
+                // Untuk jawaban parsial, kita bisa menghitung persentasenya
+                // Tapi tidak menghitung sebagai jawaban penuh
+            }
+        }
+
+        // Hitung nilai akhir (skor maksimal adalah jumlah soal)
+        $grade_exam = round(($total_score / $count_question) * 100, 2);
+
+        // Update nilai di table grades
         $grade = Grade::where('exam_id', $request->exam_id)
             ->where('exam_session_id', $request->exam_session_id)
             ->where('student_id', auth()->guard('student')->user()->id)
@@ -287,6 +364,7 @@ class ExamController extends Controller
 
         $grade->end_time        = Carbon::now();
         $grade->total_correct   = $count_correct_answer;
+        $grade->total_score     = $total_score;
         $grade->grade           = $grade_exam;
         $grade->update();
 
@@ -298,10 +376,11 @@ class ExamController extends Controller
             . "*Mata Pelajaran*: " . $exam_group->exam->title . "\n"
             . "*Jumlah Soal*: " . $count_question . "\n"
             . "*Jawaban Benar*: " . $count_correct_answer . "\n"
+            . "*Total Skor*: " . $total_score . " dari " . $count_question . "\n"
             . "*Nilai Akhir*: " . $grade_exam . "\n\n"
             . "Selamat atas hasil ujianmu!";
 
-        // Kirim WhatsApp ke nomor 08515581211
+        // Kirim WhatsApp ke nomor siswa
         $receiver = $student->phone; // Nomor telepon siswa
         $this->sendWa($receiver, $message);
 
