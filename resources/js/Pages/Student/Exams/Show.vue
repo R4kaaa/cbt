@@ -1,211 +1,200 @@
 <template>
-    <Head>
-        <title>Ujian: Soal No. {{ page }} - Aplikasi Ujian Online</title>
-    </Head>
-    <div class="container-fluid pb-5">
-        <div class="row mb-4">
-            <!-- Question Panel -->
-            <div class="col-md-8 mb-4 mb-md-0">
-                <div class="card border-0 shadow">
-                    <!-- Question Header -->
-                    <div class="card-header bg-white py-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Soal No. <strong class="fw-bold">{{ page }}</strong> dari {{ all_questions.length }}</h5>
-                            <div>
-                                <VueCountdown 
-                                    :time="duration" 
-                                    @progress="handleChangeDuration" 
-                                    @end="showModalEndTimeExam = true" 
-                                    v-slot="{ hours, minutes, seconds }">
-                                    <span class="badge bg-info p-2 fs-6"> 
-                                        <i class="fa fa-clock me-1"></i> {{ hours }} jam, {{ minutes }} menit, {{ seconds }} detik
-                                    </span>
-                                </VueCountdown>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Question Content -->
-                    <div class="card-body" style="min-height: 400px;">
-                        <div v-if="question_active !== null">
-                            <!-- Question Type Badge -->
-                            <div class="mb-2">
-                                <span class="badge" :class="question_active.question.question_type === 'multiple' ? 'bg-purple' : 'bg-info'">
-                                    {{ question_active.question.question_type === 'multiple' ? 'Pilihan Ganda (Multiple)' : 'Pilihan Tunggal' }}
+<Head>
+    <title>Ujian: Soal No. {{ page }} - Aplikasi Ujian Online</title>
+</Head>
+<div class="container-fluid pb-5">
+    <div class="row mb-4">
+        <!-- Question Panel -->
+        <div class="col-md-8 mb-4 mb-md-0">
+            <div class="card border-0 shadow">
+                <!-- Question Header -->
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Soal No. <strong class="fw-bold">{{ page }}</strong> dari {{ all_questions.length }}</h5>
+                        <div>
+                            <VueCountdown :time="duration" @progress="handleChangeDuration" @end="showModalEndTimeExam = true" v-slot="{ hours, minutes, seconds }">
+                                <span class="badge bg-info p-2 fs-6">
+                                    <i class="fa fa-clock me-1"></i> {{ hours }} jam, {{ minutes }} menit, {{ seconds }} detik
                                 </span>
+                            </VueCountdown>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Content -->
+                <!-- Question Content -->
+                <div class="card-body" style="min-height: 400px;">
+                    <div v-if="question_active !== null">
+                        <!-- Question Type Badge -->
+                        <div class="mb-2">
+                            <span class="badge" :class="question_active.question.question_type === 'multiple' ? 'bg-purple' : 'bg-info'">
+                                {{ question_active.question.question_type === 'multiple' ? 'Pilihan Ganda (Multiple)' : 'Pilihan Tunggal' }}
+                            </span>
+
+                            <!-- Added Media Type Badge -->
+                            <span v-if="question_active.question.media_type !== 'none'" class="badge bg-secondary ms-2">
+                                {{ question_active.question.media_type === 'image' ? 'Dengan Gambar' : 'Dengan Audio' }}
+                            </span>
+                        </div>
+
+                        <!-- Question Text -->
+                        <div class="question-text mb-4 pb-2 border-bottom">
+                            <!-- Question Media: Images and Audio Display -->
+                            <div v-if="question_active.question.media_type !== 'none'" class="question-media mb-3">
+                                <!-- Image Display -->
+                                <img v-if="question_active.question.media_type === 'image' && question_active.question.question_image" :src="`/storage/questions/${question_active.question.question_image}`" class="img-fluid rounded mb-3 border shadow-sm" alt="Question Image" style="max-height: 300px;" />
+
+                                <!-- Audio Display -->
+                                <div v-if="question_active.question.media_type === 'audio' && question_active.question.audio_file" class="audio-player border rounded p-3 bg-light mb-3">
+                                    <p class="mb-2"><i class="fa fa-music me-2"></i> File Audio Soal:</p>
+                                    <audio controls class="w-100">
+                                        <source :src="`/storage/questions/${question_active.question.audio_file}`" type="audio/mpeg">
+                                        Browser Anda tidak mendukung pemutaran audio.
+                                    </audio>
+                                </div>
                             </div>
-                            
+
                             <!-- Question Text -->
-                            <div class="question-text mb-4 pb-2 border-bottom">
-                                <p v-html="question_active.question.question" class="fs-5"></p>
-                                <div v-if="question_active.question.question_type === 'multiple'" class="alert alert-info">
-                                    <i class="fa fa-info-circle me-2"></i> Pilih semua jawaban yang benar
-                                </div>
+                            <p v-html="question_active.question.question" class="fs-5"></p>
+                            <div v-if="question_active.question.question_type === 'multiple'" class="alert alert-info">
+                                <i class="fa fa-info-circle me-2"></i> Pilih semua jawaban yang benar
                             </div>
+                        </div>
 
-                            <!-- Answer Options for Single Choice -->
-                            <div v-if="question_active.question.question_type === 'single'" class="answer-options">
-                                <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
-                                    <div class="d-flex">
-                                        <div class="option-label me-3">
-                                            <button 
-                                                :class="[
-                                                    'btn btn-lg fw-bold', 
-                                                    answer == question_active.answer ? 'btn-info' : 'btn-outline-info'
-                                                ]" 
-                                                @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)"
-                                            >
-                                                {{ options[index] }}
-                                            </button>
-                                        </div>
-                                        <div class="option-content flex-grow-1" 
-                                            :class="{ 'selected': answer == question_active.answer }"
-                                            @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
-                                            <p v-html="question_active.question['option_'+answer]" class="mb-0"></p>
-                                        </div>
+                        <!-- Answer Options for Single Choice -->
+                        <div v-if="question_active.question.question_type === 'single'" class="answer-options">
+                            <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
+                                <div class="d-flex">
+                                    <div class="option-label me-3">
+                                        <button :class="[
+                                    'btn btn-lg fw-bold', 
+                                    answer == question_active.answer ? 'btn-info' : 'btn-outline-info'
+                                ]" @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
+                                            {{ options[index] }}
+                                        </button>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Answer Options for Multiple Choice -->
-                            <div v-else class="answer-options">
-                                <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
-                                    <div class="d-flex">
-                                        <div class="option-label me-3">
-                                            <div class="form-check">
-                                                <input 
-                                                    class="form-check-input" 
-                                                    type="checkbox"
-                                                    :id="'option-'+answer"
-                                                    :checked="isAnswerSelected(answer)"
-                                                    @change="toggleMultipleAnswer(answer)"
-                                                    style="width: 25px; height: 25px; cursor: pointer;"
-                                                >
-                                                <label class="form-check-label" :for="'option-'+answer">
-                                                    <span class="ms-2 fs-5 fw-bold">{{ options[index] }}</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="option-content flex-grow-1" 
-                                            :class="{ 'selected': isAnswerSelected(answer) }"
-                                            @click.prevent="toggleMultipleAnswer(answer)">
-                                            <p v-html="question_active.question['option_'+answer]" class="mb-0"></p>
-                                        </div>
+                                    <div class="option-content flex-grow-1" :class="{ 'selected': answer == question_active.answer }" @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
+                                        <p v-html="question_active.question['option_'+answer]" class="mb-0"></p>
                                     </div>
-                                </div>
-                                
-                                <!-- Save Button for Multiple Choice -->
-                                <div class="d-flex justify-content-end mt-4">
-                                    <button 
-                                        @click.prevent="submitMultipleAnswers(question_active.question.exam.id, question_active.question.id)"
-                                        class="btn btn-primary px-4">
-                                        <i class="fa fa-save me-2"></i> Simpan Jawaban
-                                    </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-else class="alert alert-danger border-0 shadow text-center">
-                            <i class="fa fa-exclamation-triangle me-2"></i> Soal Tidak Ditemukan!
+                        <!-- Answer Options for Multiple Choice -->
+                        <div v-else class="answer-options">
+                            <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
+                                <div class="d-flex">
+                                    <div class="option-label me-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" :id="'option-'+answer" :checked="isAnswerSelected(answer)" @change="toggleMultipleAnswer(answer)" style="width: 25px; height: 25px; cursor: pointer;">
+                                            <label class="form-check-label" :for="'option-'+answer">
+                                                <span class="ms-2 fs-5 fw-bold">{{ options[index] }}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="option-content flex-grow-1" :class="{ 'selected': isAnswerSelected(answer) }" @click.prevent="toggleMultipleAnswer(answer)">
+                                        <p v-html="question_active.question['option_'+answer]" class="mb-0"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Save Button for Multiple Choice -->
+                            <div class="d-flex justify-content-end mt-4">
+                                <button @click.prevent="submitMultipleAnswers(question_active.question.exam.id, question_active.question.id)" class="btn btn-primary px-4">
+                                    <i class="fa fa-save me-2"></i> Simpan Jawaban
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Navigation Footer -->
-                    <div class="card-footer bg-white py-3">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <button 
-                                    v-if="page > 1" 
-                                    @click.prevent="prevPage" 
-                                    class="btn btn-secondary px-4">
-                                    <i class="fa fa-arrow-left me-2"></i> Sebelumnya
-                                </button>
-                            </div>
-                            <div>
-                                <button 
-                                    v-if="page < all_questions.length" 
-                                    @click.prevent="nextPage" 
-                                    class="btn btn-secondary px-4">
-                                    Selanjutnya <i class="fa fa-arrow-right ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
+
+                    <div v-else class="alert alert-danger border-0 shadow text-center">
+                        <i class="fa fa-exclamation-triangle me-2"></i> Soal Tidak Ditemukan!
                     </div>
                 </div>
-            </div>
-            
-            <!-- Navigation Panel -->
-            <div class="col-md-4">
-                <div class="card border-0 shadow mb-4">
-                    <div class="card-header bg-white py-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Navigasi Soal</h5>
-                            <div class="badge bg-success p-2">
-                                <i class="fa fa-check-circle me-1"></i> {{ question_answered }} dari {{ all_questions.length }} Dikerjakan
-                            </div>
+
+                <!-- Navigation Footer -->
+                <div class="card-footer bg-white py-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button v-if="page > 1" @click.prevent="prevPage" class="btn btn-secondary px-4">
+                                <i class="fa fa-arrow-left me-2"></i> Sebelumnya
+                            </button>
                         </div>
-                    </div>
-                    
-                    <div class="card-body question-nav" style="height: 320px; overflow-y: auto;">
-                        <div class="row g-2">
-                            <div 
-                                v-for="(question, index) in all_questions" 
-                                :key="index" 
-                                class="col-2">
-                                <button 
-                                    @click.prevent="clickQuestion(index)" 
-                                    :class="[
-                                        'btn btn-sm w-100 question-button', 
-                                        index+1 == page ? 'btn-dark' : 
-                                        questionIsAnswered(question) ? 'btn-info' : 'btn-outline-info'
-                                    ]">
-                                    {{ index + 1 }}
-                                </button>
-                            </div>
+                        <div>
+                            <button v-if="page < all_questions.length" @click.prevent="nextPage" class="btn btn-secondary px-4">
+                                Selanjutnya <i class="fa fa-arrow-right ms-2"></i>
+                            </button>
                         </div>
-                    </div>
-                    
-                    <div class="card-footer bg-white py-3">
-                        <button 
-                            @click="showModalEndExam = true" 
-                            class="btn btn-danger btn-lg w-100 border-0 shadow">
-                            <i class="fa fa-flag-checkered me-2"></i> Akhiri Ujian
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Exam Information -->
-                <div class="card border-0 shadow">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i> Informasi Ujian</h5>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <span>Mata Pelajaran:</span>
-                                <span class="fw-bold">{{ exam_group.exam.lesson.title }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <span>Total Soal:</span>
-                                <span class="fw-bold">{{ all_questions.length }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <span>Sudah Dijawab:</span>
-                                <span class="fw-bold">{{ question_answered }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <span>Belum Dijawab:</span>
-                                <span class="fw-bold">{{ all_questions.length - question_answered }}</span>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Confirm End Exam -->
-   <!-- Modal Confirm End Exam -->
+        <!-- Navigation Panel -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Navigasi Soal</h5>
+                        <div class="badge bg-success p-2">
+                            <i class="fa fa-check-circle me-1"></i> {{ question_answered }} dari {{ all_questions.length }} Dikerjakan
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body question-nav" style="height: 320px; overflow-y: auto;">
+                    <div class="row g-2">
+                        <div v-for="(question, index) in all_questions" :key="index" class="col-2">
+                            <button @click.prevent="clickQuestion(index)" :class="[
+                                        'btn btn-sm w-100 question-button', 
+                                        index+1 == page ? 'btn-dark' : 
+                                        questionIsAnswered(question) ? 'btn-info' : 'btn-outline-info'
+                                    ]">
+                                {{ index + 1 }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white py-3">
+                    <button @click="showModalEndExam = true" class="btn btn-danger btn-lg w-100 border-0 shadow">
+                        <i class="fa fa-flag-checkered me-2"></i> Akhiri Ujian
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exam Information -->
+            <div class="card border-0 shadow">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i> Informasi Ujian</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Mata Pelajaran:</span>
+                            <span class="fw-bold">{{ exam_group.exam.lesson.title }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Total Soal:</span>
+                            <span class="fw-bold">{{ all_questions.length }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Sudah Dijawab:</span>
+                            <span class="fw-bold">{{ question_answered }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Belum Dijawab:</span>
+                            <span class="fw-bold">{{ all_questions.length - question_answered }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirm End Exam -->
+<!-- Modal Confirm End Exam -->
 <div v-if="showModalEndExam" class="modal fade show" tabindex="-1" aria-hidden="true" style="display:block; z-index:1050;" role="dialog">
     <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
         <div class="modal-content border-0 shadow">
@@ -214,11 +203,11 @@
             </div>
             <div class="modal-body py-4">
                 <p class="fs-5 mb-0">Setelah mengakhiri ujian, Anda tidak dapat kembali ke ujian ini lagi.</p>
-                
+
                 <div v-if="all_questions.length - question_answered > 0" class="alert alert-warning mt-3">
                     <i class="fa fa-exclamation-circle me-2"></i> Masih ada <strong>{{ all_questions.length - question_answered }}</strong> soal yang belum Anda jawab.
                 </div>
-                
+
                 <p class="fw-bold mt-3 mb-0">Yakin akan mengakhiri ujian?</p>
             </div>
             <div class="modal-footer">
@@ -269,7 +258,9 @@ import {
 
 //import ref
 import {
-    ref, computed, onMounted
+    ref,
+    computed,
+    onMounted
 } from 'vue';
 
 //import VueCountdown
@@ -480,7 +471,7 @@ export default {
                     Swal.showLoading();
                 }
             });
-            
+
             Inertia.post('/student/exam-end', {
                 exam_group_id: props.exam_group.id,
                 exam_id: props.exam_group.exam.id,
@@ -498,7 +489,7 @@ export default {
                 }
             });
         });
-        
+
         //return
         return {
             options,
@@ -521,4 +512,3 @@ export default {
     }
 }
 </script>
-

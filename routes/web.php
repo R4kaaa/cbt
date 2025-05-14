@@ -39,7 +39,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/exams/{exam}/questions/{question}/edit', [\App\Http\Controllers\Admin\ExamController::class, 'editQuestion'])->name('admin.exams.editQuestion');
 
         //custom route for update question exam
-        Route::put('/exams/{exam}/questions/{question}/update', [\App\Http\Controllers\Admin\ExamController::class, 'updateQuestion'])->name('admin.exams.updateQuestion');
+        Route::post('/exams/{exam}/questions/{question}/update', [\App\Http\Controllers\Admin\ExamController::class, 'updateQuestion'])->name('admin.exams.updateQuestion');
 
         //custom route for destroy question exam
         Route::delete('/exams/{exam}/questions/{question}/destroy', [\App\Http\Controllers\Admin\ExamController::class, 'destroyQuestion'])->name('admin.exams.destroyQuestion');
@@ -88,7 +88,7 @@ Route::get('/register', [App\Http\Controllers\Student\RegisterController::class,
     ->name('students.register.view');
 Route::post('/register', [App\Http\Controllers\Student\RegisterController::class, 'store'])
     ->name('students.register');
-    
+
 //login students
 Route::post('/students/login', \App\Http\Controllers\Student\LoginController::class)->name('student.login');
 

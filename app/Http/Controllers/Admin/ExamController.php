@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Imports\QuestionsImport;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class ExamController extends Controller
 {
@@ -121,10 +122,11 @@ class ExamController extends Controller
             'exam' => $exam,
         ]);
     }
-    public function storeQuestion(Request $request, Exam $exam)
+
+    public function updateQuestion(Request $request, Exam $exam, Question $question)
     {
-        // dd($exam->all());
-        $request->validate([
+        // dd($request->all());
+        $validatedData = $request->validate([
             'question'          => 'required',
             'option_1'          => 'required',
             'option_2'          => 'required',
@@ -132,51 +134,66 @@ class ExamController extends Controller
             'option_4'          => 'required',
             'option_5'          => 'required',
             'question_type'     => 'required|in:single,multiple',
+            'media_type'        => 'required|in:none,image,audio',
+            'question_image'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'audio_file'        => 'nullable|file|mimes:mp3,wav,ogg|max:10240',
         ]);
 
-        if ($request->question_type === 'single') {
-            Question::create([
-                'exam_id'           => $exam->id,
-                'question'          => $request->question,
-                'option_1'          => $request->option_1,
-                'option_2'          => $request->option_2,
-                'option_3'          => $request->option_3,
-                'option_4'          => $request->option_4,
-                'option_5'          => $request->option_5,
-                'question_type'     => 'single',
-                'answer'            => $request->answer,
-                'answers'           => null,
-            ]);
-        } else {
-            Question::create([
-                'exam_id'           => $exam->id,
-                'question'          => $request->question,
-                'option_1'          => $request->option_1,
-                'option_2'          => $request->option_2,
-                'option_3'          => $request->option_3,
-                'option_4'          => $request->option_4,
-                'option_5'          => $request->option_5,
-                'question_type'     => 'multiple',
-                'answer'            => null,
-                'answers'           => $request->answers,
-            ]);
+        $questionImage = $question->question_image;
+        $audioFile = $question->audio_file;
+
+        if ($request->media_type === 'image') {
+            if ($request->hasFile('question_image')) {
+                // Delete old image if exists
+                if ($question->question_image && Storage::exists('public/questions/' . $question->question_image)) {
+                    Storage::delete('public/questions/' . $question->question_image);
+                }
+
+                // Generate unique filename
+                $image = $request->file('question_image');
+                $examTitle = str_replace(' ', '_', strtolower($exam->title));
+                $timestamp = now()->format('YmdHis'); // Format: YearMonthDayHourMinuteSecond
+                $extension = $image->getClientOriginalExtension();
+                $questionImage = "{$examTitle}_{$timestamp}.{$extension}";
+
+                $image->storeAs('public/questions', $questionImage);
+            }
+            $audioFile = null;
+        } else if ($request->media_type === 'audio') {
+            if ($request->hasFile('audio_file')) {
+                // Delete old audio if exists
+                if ($question->audio_file && Storage::exists('public/questions/' . $question->audio_file)) {
+                    Storage::delete('public/questions/' . $question->audio_file);
+                }
+
+                // Generate unique filename
+                $audio = $request->file('audio_file');
+                $examTitle = str_replace(' ', '_', strtolower($exam->title));
+                $timestamp = now()->format('YmdHis'); // Format: YearMonthDayHourMinuteSecond
+                $extension = $audio->getClientOriginalExtension();
+                $audioFile = "{$examTitle}_{$timestamp}.{$extension}";
+
+                $audio->storeAs('public/questions', $audioFile);
+            }
+            $questionImage = null;
+        } else if ($request->media_type === 'none') {
+            // Delete existing media files if switching to no media
+            if ($question->question_image && Storage::exists('public/questions/' . $question->question_image)) {
+                Storage::delete('public/questions/' . $question->question_image);
+            }
+            if ($question->audio_file && Storage::exists('public/questions/' . $question->audio_file)) {
+                Storage::delete('public/questions/' . $question->audio_file);
+            }
+
+            $questionImage = null;
+            $audioFile = null;
         }
-        return redirect()->route('admin.exams.show', $exam->id);
-    }
-    public function updateQuestion(Request $request, Exam $exam, Question $question)
-    {
-        $request->validate([
-            'question'          => 'required',
-            'option_1'          => 'required',
-            'option_2'          => 'required',
-            'option_3'          => 'required',
-            'option_4'          => 'required',
-            'option_5'          => 'required',
-            'question_type'     => 'required|in:single,multiple'
-        ]);
+
         if ($request->question_type === 'single') {
             $question->update([
                 'question'          => $request->question,
+                'question_image'    => $questionImage,
+                'audio_file'        => $audioFile,
                 'option_1'          => $request->option_1,
                 'option_2'          => $request->option_2,
                 'option_3'          => $request->option_3,
@@ -185,10 +202,13 @@ class ExamController extends Controller
                 'question_type'     => 'single',
                 'answer'            => $request->answer,
                 'answers'           => null,
+                'media_type'        => $request->media_type,
             ]);
         } else {
             $question->update([
                 'question'          => $request->question,
+                'question_image'    => $questionImage,
+                'audio_file'        => $audioFile,
                 'option_1'          => $request->option_1,
                 'option_2'          => $request->option_2,
                 'option_3'          => $request->option_3,
@@ -197,12 +217,92 @@ class ExamController extends Controller
                 'question_type'     => 'multiple',
                 'answer'            => null,
                 'answers'           => $request->answers,
+                'media_type'        => $request->media_type,
             ]);
         }
 
         //redirect
         return redirect()->route('admin.exams.show', $exam->id);
     }
+
+    public function storeQuestion(Request $request, Exam $exam)
+    {
+        $validatedData = $request->validate([
+            'question'          => 'required',
+            'option_1'          => 'required',
+            'option_2'          => 'required',
+            'option_3'          => 'required',
+            'option_4'          => 'required',
+            'option_5'          => 'required',
+            'question_type'     => 'required|in:single,multiple',
+            'media_type'        => 'required|in:none,image,audio',
+            'question_image'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'audio_file'        => 'nullable|file|mimes:mp3,wav,ogg|max:10240',
+        ]);
+
+        // Initialize media fields
+        $questionImage = null;
+        $audioFile = null;
+
+        // Handle image upload
+        if ($request->hasFile('question_image') && $request->media_type === 'image') {
+            $image = $request->file('question_image');
+            $examTitle = str_replace(' ', '_', strtolower($exam->title));
+            $timestamp = now()->format('YmdHis'); // Format: YearMonthDayHourMinuteSecond
+            $extension = $image->getClientOriginalExtension();
+            $questionImage = "{$examTitle}_{$timestamp}.{$extension}";
+
+            $image->storeAs('public/questions', $questionImage);
+        }
+
+        // Handle audio upload
+        if ($request->hasFile('audio_file') && $request->media_type === 'audio') {
+            $audio = $request->file('audio_file');
+            $examTitle = str_replace(' ', '_', strtolower($exam->title));
+            $timestamp = now()->format('YmdHis'); // Format: YearMonthDayHourMinuteSecond
+            $extension = $audio->getClientOriginalExtension();
+            $audioFile = "{$examTitle}_{$timestamp}.{$extension}";
+
+            $audio->storeAs('public/questions', $audioFile);
+        }
+
+        if ($request->question_type === 'single') {
+            Question::create([
+                'exam_id'           => $exam->id,
+                'question'          => $request->question,
+                'question_image'    => $questionImage,
+                'audio_file'        => $audioFile,
+                'option_1'          => $request->option_1,
+                'option_2'          => $request->option_2,
+                'option_3'          => $request->option_3,
+                'option_4'          => $request->option_4,
+                'option_5'          => $request->option_5,
+                'question_type'     => 'single',
+                'answer'            => $request->answer,
+                'answers'           => null,
+                'media_type'        => $request->media_type,
+            ]);
+        } else {
+            Question::create([
+                'exam_id'           => $exam->id,
+                'question'          => $request->question,
+                'question_image'    => $questionImage,
+                'audio_file'        => $audioFile,
+                'option_1'          => $request->option_1,
+                'option_2'          => $request->option_2,
+                'option_3'          => $request->option_3,
+                'option_4'          => $request->option_4,
+                'option_5'          => $request->option_5,
+                'question_type'     => 'multiple',
+                'answer'            => null,
+                'answers'           => $request->answers,
+                'media_type'        => $request->media_type,
+            ]);
+        }
+        return redirect()->route('admin.exams.show', $exam->id);
+    }
+
+
     public function editQuestion(Exam $exam, Question $question)
     {
         //render with inertia
@@ -214,9 +314,18 @@ class ExamController extends Controller
 
     public function destroyQuestion(Exam $exam, Question $question)
     {
+        if ($question->question_image && Storage::exists('public/questions/' . $question->question_image)) {
+            Storage::delete('public/questions/' . $question->question_image);
+        }
+
+        if ($question->audio_file && Storage::exists('public/questions/' . $question->audio_file)) {
+            Storage::delete('public/questions/' . $question->audio_file);
+        }
+
         $question->delete();
         return redirect()->route('admin.exams.show', $exam->id);
     }
+
     public function import(Exam $exam)
     {
         return inertia('Admin/Questions/Import', [

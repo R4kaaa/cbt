@@ -10,7 +10,7 @@
                     <div class="card-body">
                         <h5><i class="fa fa-question-circle"></i> Tambah Soal Ujian</h5>
                         <hr>
-                        <form @submit.prevent="submit">
+                        <form @submit.prevent="submit" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tipe Soal</label>
                                 <div class="d-flex">
@@ -29,6 +29,57 @@
                                 </div>
                                 <div v-if="errors.question_type" class="mt-2 text-danger">
                                     {{ errors.question_type }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tipe Media</label>
+                                <div class="d-flex">
+                                    <div class="form-check me-4">
+                                        <input class="form-check-input" type="radio" v-model="form.media_type" value="none" id="none" checked>
+                                        <label class="form-check-label" for="none">
+                                            Tanpa Media
+                                        </label>
+                                    </div>
+                                    <div class="form-check me-4">
+                                        <input class="form-check-input" type="radio" v-model="form.media_type" value="image" id="image">
+                                        <label class="form-check-label" for="image">
+                                            Gambar
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" v-model="form.media_type" value="audio" id="audio">
+                                        <label class="form-check-label" for="audio">
+                                            Audio (Listening)
+                                        </label>
+                                    </div>
+                                </div>
+                                <div v-if="errors.media_type" class="mt-2 text-danger">
+                                    {{ errors.media_type }}
+                                </div>
+                            </div>
+
+                            <div v-if="form.media_type === 'image'" class="mb-3">
+                                <label class="form-label fw-bold">Upload Gambar</label>
+                                <input type="file" class="form-control" @input="handleImageUpload" accept="image/*" />
+                                <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal: 2MB</small>
+                                <div v-if="errors.question_image" class="mt-2 text-danger">
+                                    {{ errors.question_image }}
+                                </div>
+                                <div v-if="imagePreview" class="mt-3">
+                                    <img :src="imagePreview" class="img-fluid" style="max-height: 200px;" />
+                                </div>
+                            </div>
+
+                            <div v-if="form.media_type === 'audio'" class="mb-3">
+                                <label class="form-label fw-bold">Upload Audio (Listening)</label>
+                                <input type="file" class="form-control" @input="handleAudioUpload" accept="audio/*" />
+                                <small class="text-muted">Format: MP3, WAV, OGG. Maksimal: 10MB</small>
+                                <div v-if="errors.audio_file" class="mt-2 text-danger">
+                                    {{ errors.audio_file }}
+                                </div>
+                                <div v-if="audioPreview" class="mt-3">
+                                    <audio controls :src="audioPreview"></audio>
                                 </div>
                             </div>
 
@@ -220,7 +271,7 @@
     } from '@inertiajs/inertia-vue3';
 
     //import reactive from vue
-    import { reactive } from 'vue';
+    import { reactive, ref } from 'vue';
 
     //import inerita adapter
     import { Inertia } from '@inertiajs/inertia';
@@ -251,8 +302,7 @@
 
         //inisialisasi composition API
         setup(props) {
-
-            //define form with reactive
+            // Define form with reactive
             const form = reactive({
                 question: '',
                 option_1: '',
@@ -261,41 +311,102 @@
                 option_4: '',
                 option_5: '',
                 question_type: 'single', // Default to single
-                answer: '',
+                media_type: 'none', // Default to none
+                answer: '1', // Default to A
                 answers: [],
+                question_image: null, // File object for image upload
+                audio_file: null, // File object for audio upload
             });
 
-            //method "submit"
+            // For image and audio preview
+            const imagePreview = ref(null);
+            const audioPreview = ref(null);
+
+            // Handle image upload
+            const handleImageUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    // Store file object in form data
+                    form.question_image = file;
+                    // Create preview URL
+                    imagePreview.value = URL.createObjectURL(file);
+                    // Reset audio file if an image is selected
+                    form.audio_file = null;
+                    audioPreview.value = null;
+                }
+            };
+
+            // Handle audio upload
+            const handleAudioUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    // Store file object in form data
+                    form.audio_file = file;
+                    // Create preview URL
+                    audioPreview.value = URL.createObjectURL(file);
+                    // Reset image file if audio is selected
+                    form.question_image = null;
+                    imagePreview.value = null;
+                }
+            };
+
+            // Method "submit" using FormData for file uploads
             const submit = () => {
-                //send data to server
-                Inertia.post(`/admin/exams/${props.exam.id}/questions/store`, {
-                    //data
-                    question: form.question,
-                    option_1: form.option_1,
-                    option_2: form.option_2,
-                    option_3: form.option_3,
-                    option_4: form.option_4,
-                    option_5: form.option_5,
-                    question_type: form.question_type,
-                    answer: form.question_type === 'single' ? form.answer : null,
-                    answers: form.question_type === 'multiple' ? form.answers : null,
-                }, {
+                // Create FormData object
+                const formData = new FormData();
+                
+                // Append basic form fields
+                formData.append('question', form.question);
+                formData.append('option_1', form.option_1);
+                formData.append('option_2', form.option_2);
+                formData.append('option_3', form.option_3);
+                formData.append('option_4', form.option_4);
+                formData.append('option_5', form.option_5);
+                formData.append('question_type', form.question_type);
+                formData.append('media_type', form.media_type);
+                
+                // Add answer based on question type
+                if (form.question_type === 'single') {
+                    formData.append('answer', form.answer);
+                } else {
+                    // Convert array to JSON string for multiple answers
+                    form.answers.forEach(answer => {
+                        formData.append('answers[]', answer);
+                    });
+                }
+                
+                // Add files if they exist
+                if (form.media_type === 'image' && form.question_image) {
+                    formData.append('question_image', form.question_image);
+                }
+                
+                if (form.media_type === 'audio' && form.audio_file) {
+                    formData.append('audio_file', form.audio_file);
+                }
+                
+                // Send data to server
+                Inertia.post(`/admin/exams/${props.exam.id}/questions/store`, formData, {
+                    forceFormData: true,
                     onSuccess: () => {
-                        //show success alert
+                        // Show success alert
                         Swal.fire({
                             title: 'Success!',
-                            text: 'Soal Ujian Berhasil Disimpan!.',
+                            text: 'Soal Ujian Berhasil Disimpan!',
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 2000
                         });
                     },
                 });
-            }
+            };
 
-            //return
+            // Return variables and methods
             return {
                 form,
+                imagePreview,
+                audioPreview,
+                handleImageUpload,
+                handleAudioUpload,
                 submit,
             };
         }
@@ -303,5 +414,4 @@
 </script>
 
 <style>
-
 </style>
