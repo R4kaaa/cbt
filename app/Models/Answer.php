@@ -22,9 +22,11 @@ class Answer extends Model
         'question_order',
         'answer_order',
         'answer',
-        'selected_answers', // New field for multiple-choice answers
+        'selected_answers', // Field for multiple-choice answers
+        'essay_answer',     // Field for essay responses
         'is_correct',
-        'score', // New field for partial credit scoring
+        'score',            // Field for partial credit scoring
+        'similarity_score', // Field for essay similarity scoring
     ];
 
     /**
@@ -35,6 +37,7 @@ class Answer extends Model
     protected $casts = [
         'selected_answers' => 'array',
         'score' => 'float',
+        'similarity_score' => 'float',
     ];
 
     /**

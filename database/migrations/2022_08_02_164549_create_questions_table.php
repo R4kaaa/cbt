@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('option_5')->nullable();
             $table->integer('answer')->nullable();
             $table->json('answers')->nullable();
-            $table->enum('question_type', ['single', 'multiple'])->default('single');
+            $table->enum('question_type', ['single', 'multiple', 'essay'])->default('single');
             $table->timestamps();
         });
     }

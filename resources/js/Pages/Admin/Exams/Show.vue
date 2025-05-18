@@ -65,19 +65,48 @@
                                     <tr v-for="(question, index) in exam.questions.data" :key="index">
                                         <td class="fw-bold text-center">{{ ++index + (exam.questions.current_page - 1) * exam.questions.per_page }}</td>
                                         <td>
+                                            <!-- Question with media handling (if present) -->
                                             <div class="fw-bold" v-html="question.question"></div>
+                                            
+                                            <!-- Display media if available -->
+                                            <div v-if="question.media_type === 'image' && question.question_image" class="mt-2 mb-2">
+                                                <img :src="`/storage/questions/${question.question_image}`" class="img-fluid" style="max-height: 200px;" alt="Question Image">
+                                            </div>
+                                            <div v-if="question.media_type === 'audio' && question.audio_file" class="mt-2 mb-2">
+                                                <audio controls>
+                                                    <source :src="`/storage/questions/${question.audio_file}`" type="audio/mpeg">
+                                                    Browser Anda tidak mendukung tag audio.
+                                                </audio>
+                                            </div>
+                                            
                                             <hr>
-                                            <ol type="A">
-                                                <li v-html="question.option_1" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 1 || (question.question_type === 'multiple' && question.answers && question.answers.includes('1')) }"></li>
-                                                <li v-html="question.option_2" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 2 || (question.question_type === 'multiple' && question.answers && question.answers.includes('2')) }"></li>
-                                                <li v-html="question.option_3" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 3 || (question.question_type === 'multiple' && question.answers && question.answers.includes('3')) }"></li>
-                                                <li v-html="question.option_4" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 4 || (question.question_type === 'multiple' && question.answers && question.answers.includes('4')) }"></li>
-                                                <li v-html="question.option_5" :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 5 || (question.question_type === 'multiple' && question.answers && question.answers.includes('5')) }"></li>
+                                            
+                                            <!-- For single and multiple choice questions -->
+                                            <ol v-if="question.question_type === 'single' || question.question_type === 'multiple'" type="A">
+                                                <li v-if="question.option_1" v-html="question.option_1" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 1 || (question.question_type === 'multiple' && question.answers && question.answers.includes('1')) }"></li>
+                                                <li v-if="question.option_2" v-html="question.option_2" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 2 || (question.question_type === 'multiple' && question.answers && question.answers.includes('2')) }"></li>
+                                                <li v-if="question.option_3" v-html="question.option_3" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 3 || (question.question_type === 'multiple' && question.answers && question.answers.includes('3')) }"></li>
+                                                <li v-if="question.option_4" v-html="question.option_4" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 4 || (question.question_type === 'multiple' && question.answers && question.answers.includes('4')) }"></li>
+                                                <li v-if="question.option_5" v-html="question.option_5" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 5 || (question.question_type === 'multiple' && question.answers && question.answers.includes('5')) }"></li>
                                             </ol>
+                                            
+                                            <!-- For essay questions -->
+                                            <div v-if="question.question_type === 'essay'" class="mt-3">
+                                                <div class="alert alert-info">
+                                                    <strong>Kunci Jawaban Essay:</strong>
+                                                    <div class="mt-2" v-html="question.essay_answer"></div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="text-center">
                                             <span v-if="question.question_type === 'single'" class="badge bg-primary">Jawaban Tunggal</span>
                                             <span v-else-if="question.question_type === 'multiple'" class="badge bg-success">Jawaban Ganda</span>
+                                            <span v-else-if="question.question_type === 'essay'" class="badge bg-warning">Essay</span>
                                         </td>
                                         <td class="text-center">
                                             <Link :href="`/admin/exams/${exam.id}/questions/${question.id}/edit`" class="btn btn-sm btn-info border-0 shadow me-2"

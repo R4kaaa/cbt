@@ -22,13 +22,12 @@
                 </div>
 
                 <!-- Question Content -->
-                <!-- Question Content -->
                 <div class="card-body" style="min-height: 400px;">
                     <div v-if="question_active !== null">
                         <!-- Question Type Badge -->
                         <div class="mb-2">
-                            <span class="badge" :class="question_active.question.question_type === 'multiple' ? 'bg-purple' : 'bg-info'">
-                                {{ question_active.question.question_type === 'multiple' ? 'Pilihan Ganda (Multiple)' : 'Pilihan Tunggal' }}
+                            <span class="badge" :class="getQuestionTypeBadgeClass(question_active.question.question_type)">
+                                {{ getQuestionTypeLabel(question_active.question.question_type) }}
                             </span>
 
                             <!-- Added Media Type Badge -->
@@ -56,8 +55,15 @@
 
                             <!-- Question Text -->
                             <p v-html="question_active.question.question" class="fs-5"></p>
+
+                            <!-- Help text for multiple choice -->
                             <div v-if="question_active.question.question_type === 'multiple'" class="alert alert-info">
                                 <i class="fa fa-info-circle me-2"></i> Pilih semua jawaban yang benar
+                            </div>
+
+                            <!-- Help text for essay -->
+                            <div v-if="question_active.question.question_type === 'essay'" class="alert alert-warning">
+                                <i class="fa fa-pencil-alt me-2"></i> Ketik jawaban essay Anda pada kotak di bawah
                             </div>
                         </div>
 
@@ -81,7 +87,7 @@
                         </div>
 
                         <!-- Answer Options for Multiple Choice -->
-                        <div v-else class="answer-options">
+                        <div v-else-if="question_active.question.question_type === 'multiple'" class="answer-options">
                             <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
                                 <div class="d-flex">
                                     <div class="option-label me-3">
@@ -103,6 +109,26 @@
                                 <button @click.prevent="submitMultipleAnswers(question_active.question.exam.id, question_active.question.id)" class="btn btn-primary px-4">
                                     <i class="fa fa-save me-2"></i> Simpan Jawaban
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Essay Answer Section -->
+                        <div v-else-if="question_active.question.question_type === 'essay'" class="essay-answer mt-4">
+                            <div class="form-group">
+                                <label for="essay-answer" class="form-label fw-bold mb-2">
+                                    <i class="fa fa-pen me-2"></i>Jawaban Essay:
+                                </label>
+                                <textarea id="essay-answer" v-model="essayAnswer" class="form-control" rows="10" placeholder="Ketik jawaban essay Anda di sini..." style="font-size: 16px;"></textarea>
+
+                                <div class="character-count text-end text-muted mt-2">
+                                    <small>{{ essayAnswer.length }} karakter</small>
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button @click.prevent="submitEssayAnswer(question_active.question.exam.id, question_active.question.id)" class="btn btn-primary px-4">
+                                        <i class="fa fa-save me-2"></i> Simpan Jawaban
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -146,11 +172,14 @@
                     <div class="row g-2">
                         <div v-for="(question, index) in all_questions" :key="index" class="col-2">
                             <button @click.prevent="clickQuestion(index)" :class="[
-                                        'btn btn-sm w-100 question-button', 
-                                        index+1 == page ? 'btn-dark' : 
-                                        questionIsAnswered(question) ? 'btn-info' : 'btn-outline-info'
-                                    ]">
+                                    'btn btn-sm w-100 question-button', 
+                                    index+1 == page ? 'btn-dark' : 
+                                    questionIsAnswered(question) ? getQuestionTypeButtonClass(question.question.question_type) : 'btn-outline-info'
+                                ]" :title="getQuestionTypeLabel(question.question.question_type)">
                                 {{ index + 1 }}
+                                <span v-if="question.question.question_type === 'essay'" class="small">
+                                    <i class="fa fa-pen-alt"></i>
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -193,7 +222,6 @@
     </div>
 </div>
 
-<!-- Modal Confirm End Exam -->
 <!-- Modal Confirm End Exam -->
 <div v-if="showModalEndExam" class="modal fade show" tabindex="-1" aria-hidden="true" style="display:block; z-index:1050;" role="dialog">
     <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
@@ -260,7 +288,8 @@ import {
 import {
     ref,
     computed,
-    onMounted
+    onMounted,
+    watch
 } from 'vue';
 
 //import VueCountdown
@@ -314,16 +343,78 @@ export default {
         // Multiple choice selections
         const selectedAnswers = ref([]);
 
-        // Initialize selectedAnswers from existing data
+        // Essay answer
+        const essayAnswer = ref('');
+
+        // Initialize answer data based on question type
         onMounted(() => {
-            if (props.question_active && props.question_active.question.question_type === 'multiple') {
+            if (props.question_active) {
+                if (props.question_active.question.question_type === 'multiple') {
+                    try {
+                        const parsedAnswers = JSON.parse(props.question_active.selected_answers || '[]');
+                        selectedAnswers.value = Array.isArray(parsedAnswers) ? parsedAnswers : [];
+                    } catch (e) {
+                        selectedAnswers.value = [];
+                        console.error("Error parsing selected answers:", e);
+                    }
+                } else if (props.question_active.question.question_type === 'essay') {
+                    // Load the essay answer if it exists
+                    essayAnswer.value = props.question_active.essay_answer || '';
+                }
+            }
+        });
+
+        // Watch for changes in active question to update essay answer
+        watch(() => props.question_active, (newVal) => {
+            if (newVal && newVal.question.question_type === 'essay') {
+                essayAnswer.value = newVal.essay_answer || '';
+            } else if (newVal && newVal.question.question_type === 'multiple') {
                 try {
-                    const parsedAnswers = JSON.parse(props.question_active.selected_answers || '[]');
+                    const parsedAnswers = JSON.parse(newVal.selected_answers || '[]');
                     selectedAnswers.value = Array.isArray(parsedAnswers) ? parsedAnswers : [];
                 } catch (e) {
                     selectedAnswers.value = [];
-                    console.error("Error parsing selected answers:", e);
                 }
+            }
+        });
+
+        // Helper methods for question type styling
+        const getQuestionTypeLabel = ((type) => {
+            switch (type) {
+                case 'single':
+                    return 'Pilihan Tunggal';
+                case 'multiple':
+                    return 'Pilihan Ganda (Multiple)';
+                case 'essay':
+                    return 'Essay';
+                default:
+                    return 'Pilihan Tunggal';
+            }
+        });
+
+        const getQuestionTypeBadgeClass = ((type) => {
+            switch (type) {
+                case 'single':
+                    return 'bg-info';
+                case 'multiple':
+                    return 'bg-purple';
+                case 'essay':
+                    return 'bg-warning';
+                default:
+                    return 'bg-info';
+            }
+        });
+
+        const getQuestionTypeButtonClass = ((type) => {
+            switch (type) {
+                case 'single':
+                    return 'btn-info';
+                case 'multiple':
+                    return 'btn-purple';
+                case 'essay':
+                    return 'btn-warning';
+                default:
+                    return 'btn-info';
             }
         });
 
@@ -365,18 +456,64 @@ export default {
             });
         });
 
-        // Check if a question has been answered (works for both single and multiple)
+        // Submit essay answer
+        const submitEssayAnswer = ((exam_id, question_id) => {
+            // Show loading indicator
+            Swal.fire({
+                position: 'top-end',
+                icon: 'info',
+                title: 'Menyimpan jawaban...',
+                showConfirmButton: false,
+                toast: true
+            });
+
+            Inertia.post('/student/exam-answer', {
+                exam_id: exam_id,
+                exam_session_id: props.exam_group.exam_session.id,
+                question_id: question_id,
+                essay_answer: essayAnswer.value,
+                duration: duration.value
+            }, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Jawaban essay disimpan!',
+                        showConfirmButton: false,
+                        timer: 1000,
+                        toast: true
+                    });
+                },
+                onError: (errors) => {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'Gagal menyimpan jawaban!',
+                        text: Object.values(errors).flat().join(' '),
+                        showConfirmButton: false,
+                        timer: 3000,
+                        toast: true
+                    });
+                }
+            });
+        });
+
+        // Check if a question has been answered (works for all types)
         const questionIsAnswered = ((question) => {
             if (question.question.question_type === 'single') {
                 return question.answer !== 0;
-            } else {
+            } else if (question.question.question_type === 'multiple') {
                 try {
                     const selected = JSON.parse(question.selected_answers || '[]');
                     return Array.isArray(selected) && selected.length > 0;
                 } catch (e) {
                     return false;
                 }
+            } else if (question.question.question_type === 'essay') {
+                return question.essay_answer && question.essay_answer.trim() !== '';
             }
+            return false;
         });
 
         //handleChangeDuration
@@ -507,8 +644,84 @@ export default {
             isAnswerSelected,
             toggleMultipleAnswer,
             submitMultipleAnswers,
-            questionIsAnswered
+            questionIsAnswered,
+            // Essay methods
+            essayAnswer,
+            submitEssayAnswer,
+            // Helper methods for UI
+            getQuestionTypeLabel,
+            getQuestionTypeBadgeClass,
+            getQuestionTypeButtonClass
         }
     }
 }
 </script>
+
+<style>
+/* Question type colors */
+.bg-purple {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.btn-purple {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.btn-outline-purple {
+    border-color: #6f42c1;
+    color: #6f42c1;
+}
+
+.btn-outline-purple:hover {
+    background-color: #6f42c1;
+    color: white;
+}
+
+/* Selected option styling */
+.option-content.selected {
+    background-color: #e7f3ff;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    border-left: 4px solid #0d6efd;
+}
+
+/* Essay input styling */
+#essay-answer:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+}
+
+/* Navigation button styling */
+.question-button {
+    font-weight: bold;
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+/* Style for question navigation with question type indicators */
+.question-nav .btn-warning,
+.question-nav .btn-outline-warning {
+    position: relative;
+}
+
+.question-nav .small {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    font-size: 8px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    padding: 1px;
+    height: 12px;
+    width: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>

@@ -25,6 +25,7 @@ class Question extends Model
         'option_4',
         'option_5',
         'answer',
+        'essay_answer',
         'question_type', // Single or multiple
         'answers', // JSON array of correct answers for multiple type
         'media_type', // None, image, audio

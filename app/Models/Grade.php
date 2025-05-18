@@ -24,6 +24,7 @@ class Grade extends Model
         'total_correct',
         'total_score', // New field for partial credit sum
         'grade',
+        'total_partial', // New field for total partial score
     ];
 
     /**

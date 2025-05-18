@@ -125,18 +125,14 @@ class ExamController extends Controller
 
     public function updateQuestion(Request $request, Exam $exam, Question $question)
     {
-        // dd($request->all());
         $validatedData = $request->validate([
             'question'          => 'required',
-            'option_1'          => 'required',
-            'option_2'          => 'required',
-            'option_3'          => 'required',
-            'option_4'          => 'required',
-            'option_5'          => 'required',
-            'question_type'     => 'required|in:single,multiple',
-            'media_type'        => 'required|in:none,image,audio',
-            'question_image'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'audio_file'        => 'nullable|file|mimes:mp3,wav,ogg|max:10240',
+            'option_1'          => 'nullable|required_if:question_type,single,multiple',
+            'option_2'          => 'nullable|required_if:question_type,single,multiple',
+            'option_3'          => 'nullable|required_if:question_type,single,multiple',
+            'option_4'          => 'nullable|required_if:question_type,single,multiple',
+            'option_5'          => 'nullable|required_if:question_type,single,multiple',
+            'question_type'     => 'required|in:single,multiple,essay',
         ]);
 
         $questionImage = $question->question_image;
@@ -202,9 +198,10 @@ class ExamController extends Controller
                 'question_type'     => 'single',
                 'answer'            => $request->answer,
                 'answers'           => null,
+                'essay_answer'      => null,
                 'media_type'        => $request->media_type,
             ]);
-        } else {
+        } else if ($request->question_type === 'multiple') {
             $question->update([
                 'question'          => $request->question,
                 'question_image'    => $questionImage,
@@ -217,6 +214,23 @@ class ExamController extends Controller
                 'question_type'     => 'multiple',
                 'answer'            => null,
                 'answers'           => $request->answers,
+                'essay_answer'      => null,
+                'media_type'        => $request->media_type,
+            ]);
+        } else { // essay
+            $question->update([
+                'question'          => $request->question,
+                'question_image'    => $questionImage,
+                'audio_file'        => $audioFile,
+                'option_1'          => null,
+                'option_2'          => null,
+                'option_3'          => null,
+                'option_4'          => null,
+                'option_5'          => null,
+                'question_type'     => 'essay',
+                'answer'            => null,
+                'answers'           => null,
+                'essay_answer'      => $request->essay_answer,
                 'media_type'        => $request->media_type,
             ]);
         }
@@ -229,15 +243,12 @@ class ExamController extends Controller
     {
         $validatedData = $request->validate([
             'question'          => 'required',
-            'option_1'          => 'required',
-            'option_2'          => 'required',
-            'option_3'          => 'required',
-            'option_4'          => 'required',
-            'option_5'          => 'required',
-            'question_type'     => 'required|in:single,multiple',
-            'media_type'        => 'required|in:none,image,audio',
-            'question_image'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'audio_file'        => 'nullable|file|mimes:mp3,wav,ogg|max:10240',
+            'option_1'          => 'nullable|required_if:question_type,single,multiple',
+            'option_2'          => 'nullable|required_if:question_type,single,multiple',
+            'option_3'          => 'nullable|required_if:question_type,single,multiple',
+            'option_4'          => 'nullable|required_if:question_type,single,multiple',
+            'option_5'          => 'nullable|required_if:question_type,single,multiple',
+            'question_type'     => 'required|in:single,multiple,essay',
         ]);
 
         // Initialize media fields
@@ -280,9 +291,10 @@ class ExamController extends Controller
                 'question_type'     => 'single',
                 'answer'            => $request->answer,
                 'answers'           => null,
+                'essay_answer'      => null,
                 'media_type'        => $request->media_type,
             ]);
-        } else {
+        } else if ($request->question_type === 'multiple') {
             Question::create([
                 'exam_id'           => $exam->id,
                 'question'          => $request->question,
@@ -296,12 +308,29 @@ class ExamController extends Controller
                 'question_type'     => 'multiple',
                 'answer'            => null,
                 'answers'           => $request->answers,
+                'essay_answer'      => null,
+                'media_type'        => $request->media_type,
+            ]);
+        } else { // essay
+            Question::create([
+                'exam_id'           => $exam->id,
+                'question'          => $request->question,
+                'question_image'    => $questionImage,
+                'audio_file'        => $audioFile,
+                'option_1'          => null,
+                'option_2'          => null,
+                'option_3'          => null,
+                'option_4'          => null,
+                'option_5'          => null,
+                'question_type'     => 'essay',
+                'answer'            => null,
+                'answers'           => null,
+                'essay_answer'      => $request->essay_answer,
                 'media_type'        => $request->media_type,
             ]);
         }
         return redirect()->route('admin.exams.show', $exam->id);
     }
-
 
     public function editQuestion(Exam $exam, Question $question)
     {

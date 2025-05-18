@@ -1,3 +1,4 @@
+
 <template>
     <Head>
         <title>Edit Soal Ujian - Aplikasi Ujian Online</title>
@@ -20,10 +21,16 @@
                                             Jawaban Tunggal
                                         </label>
                                     </div>
-                                    <div class="form-check">
+                                    <div class="form-check me-4">
                                         <input class="form-check-input" type="radio" v-model="form.question_type" value="multiple" id="multiple">
                                         <label class="form-check-label" for="multiple">
                                             Jawaban Ganda
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" v-model="form.question_type" value="essay" id="essay">
+                                        <label class="form-check-label" for="essay">
+                                            Essay
                                         </label>
                                     </div>
                                 </div>
@@ -111,147 +118,170 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td style="width:20%" class="fw-bold">Pilihan A</td>
+                                        <!-- Options shown only for single and multiple choice questions -->
+                                        <template v-if="form.question_type === 'single' || form.question_type === 'multiple'">
+                                            <tr>
+                                                <td style="width:20%" class="fw-bold">Pilihan A</td>
+                                                <td>
+                                                    <Editor 
+                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
+                                                        v-model="form.option_1" 
+                                                        :init="{
+                                                            height: 130,
+                                                            menubar: false,
+                                                            plugins: 'lists link image emoticons',
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                        }"
+                                                    />
+                                                    <div v-if="errors.option_1" class="mt-2 text-danger">
+                                                        {{ errors.option_1 }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:20%" class="fw-bold">Pilihan B</td>
+                                                <td>
+                                                    <Editor 
+                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
+                                                        v-model="form.option_2" 
+                                                        :init="{
+                                                            height: 130,
+                                                            menubar: false,
+                                                            plugins: 'lists link image emoticons',
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                        }"
+                                                    />
+                                                    <div v-if="errors.option_2" class="mt-2 text-danger">
+                                                        {{ errors.option_2 }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:20%" class="fw-bold">Pilihan C</td>
+                                                <td>
+                                                    <Editor 
+                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
+                                                        v-model="form.option_3" 
+                                                        :init="{
+                                                            height: 130,
+                                                            menubar: false,
+                                                            plugins: 'lists link image emoticons',
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                        }"
+                                                    />
+                                                    <div v-if="errors.option_3" class="mt-2 text-danger">
+                                                        {{ errors.option_3 }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:20%" class="fw-bold">Pilihan D</td>
+                                                <td>
+                                                    <Editor 
+                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
+                                                        v-model="form.option_4" 
+                                                        :init="{
+                                                            height: 130,
+                                                            menubar: false,
+                                                            plugins: 'lists link image emoticons',
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                        }"
+                                                    />
+                                                    <div v-if="errors.option_4" class="mt-2 text-danger">
+                                                        {{ errors.option_4 }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:20%" class="fw-bold">Pilihan E</td>
+                                                <td>
+                                                    <Editor 
+                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
+                                                        v-model="form.option_5" 
+                                                        :init="{
+                                                            height: 130,
+                                                            menubar: false,
+                                                            plugins: 'lists link image emoticons',
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                        }"
+                                                    />
+                                                    <div v-if="errors.option_5" class="mt-2 text-danger">
+                                                        {{ errors.option_5 }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="form.question_type === 'single'">
+                                                <td style="width:20%" class="fw-bold">Jawaban Benar</td>
+                                                <td>
+                                                    <select class="form-control" v-model="form.answer">
+                                                        <option value="1">A</option>
+                                                        <option value="2">B</option>
+                                                        <option value="3">C</option>
+                                                        <option value="4">D</option>
+                                                        <option value="5">E</option>
+                                                    </select>
+                                                    <div v-if="errors.answer" class="mt-2 text-danger">
+                                                        {{ errors.answer }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="form.question_type === 'multiple'">
+                                                <td style="width:20%" class="fw-bold">Jawaban Benar</td>
+                                                <td>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="1" id="answer1">
+                                                        <label class="form-check-label" for="answer1">
+                                                            A
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="2" id="answer2">
+                                                        <label class="form-check-label" for="answer2">
+                                                            B
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="3" id="answer3">
+                                                        <label class="form-check-label" for="answer3">
+                                                            C
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="4" id="answer4">
+                                                        <label class="form-check-label" for="answer4">
+                                                            D
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="5" id="answer5">
+                                                        <label class="form-check-label" for="answer5">
+                                                            E
+                                                        </label>
+                                                    </div>
+                                                    <div v-if="errors.answers" class="mt-2 text-danger">
+                                                        {{ errors.answers }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <!-- Essay answer field - only shown for essay questions -->
+                                        <tr v-if="form.question_type === 'essay'">
+                                            <td style="width:20%" class="fw-bold">Kunci Jawaban Essay</td>
                                             <td>
                                                 <Editor 
                                                     api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                    v-model="form.option_1" 
+                                                    v-model="form.essay_answer" 
                                                     :init="{
-                                                        height: 130,
+                                                        height: 200,
                                                         menubar: false,
                                                         plugins: 'lists link image emoticons',
                                                         toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
                                                     }"
                                                 />
-                                                <div v-if="errors.option_1" class="mt-2 text-danger">
-                                                    {{ errors.option_1 }}
+                                                <div v-if="errors.essay_answer" class="mt-2 text-danger">
+                                                    {{ errors.essay_answer }}
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:20%" class="fw-bold">Pilihan B</td>
-                                            <td>
-                                                <Editor 
-                                                    api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                    v-model="form.option_2" 
-                                                    :init="{
-                                                        height: 130,
-                                                        menubar: false,
-                                                        plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }"
-                                                />
-                                                <div v-if="errors.option_2" class="mt-2 text-danger">
-                                                    {{ errors.option_2 }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:20%" class="fw-bold">Pilihan C</td>
-                                            <td>
-                                                <Editor 
-                                                    api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                    v-model="form.option_3" 
-                                                    :init="{
-                                                        height: 130,
-                                                        menubar: false,
-                                                        plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }"
-                                                />
-                                                <div v-if="errors.option_3" class="mt-2 text-danger">
-                                                    {{ errors.option_3 }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:20%" class="fw-bold">Pilihan D</td>
-                                            <td>
-                                                <Editor 
-                                                    api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                    v-model="form.option_4" 
-                                                    :init="{
-                                                        height: 130,
-                                                        menubar: false,
-                                                        plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }"
-                                                />
-                                                <div v-if="errors.option_4" class="mt-2 text-danger">
-                                                    {{ errors.option_4 }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:20%" class="fw-bold">Pilihan E</td>
-                                            <td>
-                                                <Editor 
-                                                    api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                    v-model="form.option_5" 
-                                                    :init="{
-                                                        height: 130,
-                                                        menubar: false,
-                                                        plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }"
-                                                />
-                                                <div v-if="errors.option_5" class="mt-2 text-danger">
-                                                    {{ errors.option_5 }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr v-if="form.question_type === 'single'">
-                                            <td style="width:20%" class="fw-bold">Jawaban Benar</td>
-                                            <td>
-                                                <select class="form-control" v-model="form.answer">
-                                                    <option value="1">A</option>
-                                                    <option value="2">B</option>
-                                                    <option value="3">C</option>
-                                                    <option value="4">D</option>
-                                                    <option value="5">E</option>
-                                                </select>
-                                                <div v-if="errors.answer" class="mt-2 text-danger">
-                                                    {{ errors.answer }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr v-if="form.question_type === 'multiple'">
-                                            <td style="width:20%" class="fw-bold">Jawaban Benar</td>
-                                            <td>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="1" id="answer1">
-                                                    <label class="form-check-label" for="answer1">
-                                                        A
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="2" id="answer2">
-                                                    <label class="form-check-label" for="answer2">
-                                                        B
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="3" id="answer3">
-                                                    <label class="form-check-label" for="answer3">
-                                                        C
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="4" id="answer4">
-                                                    <label class="form-check-label" for="answer4">
-                                                        D
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" v-model="form.answers" value="5" id="answer5">
-                                                    <label class="form-check-label" for="answer5">
-                                                        E
-                                                    </label>
-                                                </div>
-                                                <div v-if="errors.answers" class="mt-2 text-danger">
-                                                    {{ errors.answers }}
-                                                </div>
+                                                <small class="text-muted mt-2">Masukkan kunci jawaban atau panduan penilaian untuk soal essay.</small>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -333,6 +363,7 @@
                 answers: Array.isArray(props.question.answers) 
                     ? props.question.answers 
                     : (props.question.answers ? props.question.answers.split(',') : []),
+                essay_answer: props.question.essay_answer || '', // Add essay_answer field
                 question_image: null, // File object for new image upload
                 audio_file: null, // File object for new audio upload
             });
@@ -372,22 +403,28 @@
                 
                 // Append basic form fields
                 formData.append('question', form.question);
-                formData.append('option_1', form.option_1);
-                formData.append('option_2', form.option_2);
-                formData.append('option_3', form.option_3);
-                formData.append('option_4', form.option_4);
-                formData.append('option_5', form.option_5);
                 formData.append('question_type', form.question_type);
                 formData.append('media_type', form.media_type);
+                
+                // Add fields based on question type
+                if (form.question_type === 'single' || form.question_type === 'multiple') {
+                    formData.append('option_1', form.option_1);
+                    formData.append('option_2', form.option_2);
+                    formData.append('option_3', form.option_3);
+                    formData.append('option_4', form.option_4);
+                    formData.append('option_5', form.option_5);
+                }
                 
                 // Add answer based on question type
                 if (form.question_type === 'single') {
                     formData.append('answer', form.answer);
-                } else {
+                } else if (form.question_type === 'multiple') {
                     // Convert array to JSON string for multiple answers
                     form.answers.forEach(answer => {
                         formData.append('answers[]', answer);
                     });
+                } else if (form.question_type === 'essay') {
+                    formData.append('essay_answer', form.essay_answer);
                 }
                 
                 // Add files if they exist
@@ -399,7 +436,7 @@
                     formData.append('audio_file', form.audio_file);
                 }
                 
-                // Send data to server using PUT method
+                // Send data to server using POST method
                 Inertia.post(`/admin/exams/${props.exam.id}/questions/${props.question.id}/update`, formData, {
                     forceFormData: true,
                     preserveScroll: true,
