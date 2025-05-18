@@ -10,21 +10,23 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 class StudentsImport implements ToModel, WithHeadingRow, WithValidation
 {
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @param array $row
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
         return new Student([
             'nisn'          => (int) $row['nisn'],
             'name'          => $row['name'],
+            'email'         => $row['email'],
+            'phone'         => $row['phone'],
             'password'      => $row['password'],
             'gender'        => $row['gender'],
             'classroom_id'  => (int) $row['classroom_id'],
         ]);
     }
-        
+
     /**
      * rules
      *
