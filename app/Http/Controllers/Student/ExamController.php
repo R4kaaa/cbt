@@ -409,7 +409,7 @@ class ExamController extends Controller
     public function sendWa($receiver, $message)
     {
         try {
-            $token = "M9kpxFexDAbVG5CzcmLJ";
+            $token = "gPJWPKThyVDTpJfwdMFW";
             $curl = curl_init();
             curl_setopt_array($curl, array(
                 CURLOPT_URL => 'https://api.fonnte.com/send',
