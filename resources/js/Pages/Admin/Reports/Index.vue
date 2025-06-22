@@ -15,6 +15,7 @@
                                 <div class="col-md-9">
                                     <label class="control-label" for="name">Ujian</label>
                                     <select class="form-select" v-model="form.exam_id">
+                                        <option value="">-- Pilih Ujian --</option>
                                         <option v-for="(exam, index) in exams" :key="index" :value="exam.id">{{ exam.title }} — Kelas : {{ exam.classroom.title }} — Pelajaran : {{ exam.lesson.title }}</option>
                                     </select>
                                     <div v-if="errors.exam_id" class="alert alert-danger mt-2">
@@ -23,7 +24,11 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label fw-bold text-white">*</label>
-                                    <button type="submit" class="btn btn-md btn-primary border-0 shadow w-100"> <i class="fa fa-filter"></i> Filter</button>
+                                    <button type="submit" class="btn btn-md btn-primary border-0 shadow w-100" :disabled="loading"> 
+                                        <i class="fa fa-filter"></i> 
+                                        <span v-if="loading">Loading...</span>
+                                        <span v-else>Filter</span>
+                                    </button>
                                 </div>
                             </div>
 
@@ -73,6 +78,17 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Alert ketika tidak ada data -->
+                <div v-if="showNoDataAlert" class="card border-0 shadow">
+                    <div class="card-body text-center">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fa fa-exclamation-triangle fa-2x mb-3"></i>
+                            <h5>Tidak Ada Data Nilai</h5>
+                            <p class="mb-0">Ujian belum dilakukan atau belum ada siswa yang mengerjakan ujian ini.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -88,10 +104,13 @@
     } from '@inertiajs/inertia-vue3';
 
     //import reactive from vue
-    import { reactive } from 'vue';
+    import { reactive, ref, watch } from 'vue';
 
     //import inerita adapter
     import { Inertia } from '@inertiajs/inertia';
+
+    //import sweetalert2
+    import Swal from 'sweetalert2';
 
     export default {
 
@@ -108,24 +127,85 @@
             errors: Object,
             exams: Array,
             grades: Array,
+            showAlert: {
+                type: Boolean,
+                default: false
+            },
+            alertMessage: {
+                type: String,
+                default: ''
+            }
         },
 
         //inisialisasi composition API
-        setup() {
+        setup(props) {
 
             //define state
             const form = reactive({
                 'exam_id': '' || (new URL(document.location)).searchParams.get('exam_id'),
             });
 
+            const loading = ref(false);
+            const showNoDataAlert = ref(false);
+
+            //watch untuk menampilkan alert dari server
+            watch(() => props.showAlert, (newVal) => {
+                if (newVal) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Ujian Belum Dilakukan',
+                        text: props.alertMessage || 'Ujian belum dilakukan atau belum ada siswa yang mengerjakan ujian ini.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+            }, { immediate: true });
+
+            //watch untuk menampilkan alert local
+            watch(() => props.grades, (newGrades) => {
+                if (form.exam_id && newGrades.length === 0) {
+                    showNoDataAlert.value = true;
+                } else {
+                    showNoDataAlert.value = false;
+                }
+            });
+
              //define methods filter
             const filter = () => {
 
+                if (!form.exam_id) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Pilih Ujian',
+                        text: 'Silakan pilih ujian terlebih dahulu.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    return;
+                }
+
+                loading.value = true;
+
                 //HTTP request
                 Inertia.get('/admin/reports/filter', {
-
                     //send data to server
                     exam_id: form.exam_id,
+                }, {
+                    onFinish: () => {
+                        loading.value = false;
+                    },
+                    onError: (errors) => {
+                        loading.value = false;
+                        if (errors.exam_id) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: errors.exam_id,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+                    }
                 });
 
             }
@@ -133,7 +213,9 @@
             //return
             return {
                 form,
-                filter
+                filter,
+                loading,
+                showNoDataAlert
             }
 
         }
