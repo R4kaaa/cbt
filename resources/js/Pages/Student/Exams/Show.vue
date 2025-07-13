@@ -200,7 +200,7 @@
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Mata Pelajaran:</span>
+                            <span>Materi:</span>
                             <span class="fw-bold">{{ exam_group.exam.lesson.title }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">

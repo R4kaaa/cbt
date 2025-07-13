@@ -53,7 +53,7 @@
                                         <td>{{ exam_group.exam.title }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold bg-light">Mata Pelajaran</td>
+                                        <td class="fw-bold bg-light">Materi</td>
                                         <td>{{ exam_group.exam.lesson.title }}</td>
                                     </tr>
                                     <tr>

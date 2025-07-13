@@ -35,7 +35,7 @@
                                     <tr class="border-0">
                                         <th class="border-0 rounded-start" style="width:5%">No.</th>
                                         <th class="border-0">Ujian</th>
-                                        <th class="border-0">Pelajaran</th>
+                                        <th class="border-0">Materi</th>
                                         <th class="border-0">Kelas</th>
                                         <th class="border-0">Jumlah Soal</th>
                                         <th class="border-0 rounded-end" style="width:15%">Aksi</th>

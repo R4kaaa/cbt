@@ -20,7 +20,7 @@
                                         <td>{{ exam_session.exam.title }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">Mata Pelajaran</td>
+                                        <td class="fw-bold">Materi</td>
                                         <td>{{ exam_session.exam.lesson.title }}</td>
                                     </tr>
                                     <tr>

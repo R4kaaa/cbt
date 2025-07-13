@@ -23,7 +23,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-4">
-                                        <label>Mata Pelajaran</label> 
+                                        <label>Materi</label> 
                                         <select class="form-select" v-model="form.lesson_id">
                                             <option v-for="(lesson, index) in lessons" :key="index" :value="lesson.id">{{ lesson.title }}</option>
                                         </select>

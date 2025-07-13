@@ -19,8 +19,8 @@ class ExamSessionController extends Controller
     public function index()
     {
         //get exam_sessions
-        $exam_sessions = ExamSession::when(request()->q, function($exam_sessions) {
-            $exam_sessions = $exam_sessions->where('title', 'like', '%'. request()->q . '%');
+        $exam_sessions = ExamSession::when(request()->q, function ($exam_sessions) {
+            $exam_sessions = $exam_sessions->where('title', 'like', '%' . request()->q . '%');
         })->with('exam.classroom', 'exam.lesson', 'exam_groups')->latest()->paginate(5);
 
         //append query string to pagination links
@@ -41,7 +41,7 @@ class ExamSessionController extends Controller
     {
         //get exams
         $exams = Exam::all();
-        
+
         //render with inertia
         return inertia('Admin/ExamSessions/Create', [
             'exams' => $exams,
@@ -65,12 +65,27 @@ class ExamSessionController extends Controller
         ]);
 
         //create exam_session
-        ExamSession::create([
+        $exam_session = ExamSession::create([
             'title'         => $request->title,
             'exam_id'       => $request->exam_id,
             'start_time'    => date('Y-m-d H:i:s', strtotime($request->start_time)),
             'end_time'      => date('Y-m-d H:i:s', strtotime($request->end_time)),
         ]);
+
+        // Get exam data
+        $exam = Exam::findOrFail($request->exam_id);
+
+        // Get all students from the exam's classroom
+        $students = Student::where('classroom_id', $exam->classroom_id)->get();
+
+        // Automatically enroll all students to the exam group
+        foreach ($students as $student) {
+            ExamGroup::create([
+                'exam_id'         => $exam->id,
+                'exam_session_id' => $exam_session->id,
+                'student_id'      => $student->id,
+            ]);
+        }
 
         //redirect
         return redirect()->route('admin.exam_sessions.index');
@@ -106,10 +121,10 @@ class ExamSessionController extends Controller
     {
         //get exam_session
         $exam_session = ExamSession::findOrFail($id);
-        
+
         //get exams
         $exams = Exam::all();
-        
+
         //render with inertia
         return inertia('Admin/ExamSessions/Edit', [
             'exam_session'  => $exam_session,
@@ -133,7 +148,7 @@ class ExamSessionController extends Controller
             'start_time'    => 'required',
             'end_time'      => 'required',
         ]);
-        
+
         //update exam_session
         $exam_session->update([
             'title'         => $request->title,
@@ -141,7 +156,7 @@ class ExamSessionController extends Controller
             'start_time'    => date('Y-m-d H:i:s', strtotime($request->start_time)),
             'end_time'      => date('Y-m-d H:i:s', strtotime($request->end_time)),
         ]);
-        
+
         //redirect
         return redirect()->route('admin.exam_sessions.index');
     }
@@ -156,10 +171,10 @@ class ExamSessionController extends Controller
     {
         //get exam_session
         $exam_session = ExamSession::findOrFail($id);
-        
+
         //delete exam_session
         $exam_session->delete();
-        
+
         //redirect
         return redirect()->route('admin.exam_sessions.index');
     }
@@ -177,7 +192,7 @@ class ExamSessionController extends Controller
 
         //get students already enrolled
         $students_enrolled = ExamGroup::where('exam_id', $exam->id)->where('exam_session_id', $exam_session->id)->pluck('student_id')->all();
-        
+
         //get students
         $students = Student::with('classroom')->where('classroom_id', $exam->classroom_id)->whereNotIn('id', $students_enrolled)->get();
 
@@ -201,21 +216,21 @@ class ExamSessionController extends Controller
         $request->validate([
             'student_id'    => 'required',
         ]);
-        
+
         //create exam_group
-        foreach($request->student_id as $student_id) {
+        foreach ($request->student_id as $student_id) {
 
             //select student
             $student = Student::findOrFail($student_id);
 
             //create exam_group
             ExamGroup::create([
-                'exam_id'         => $request->exam_id,  
+                'exam_id'         => $request->exam_id,
                 'exam_session_id' => $exam_session->id,
                 'student_id'      => $student->id,
             ]);
         }
-        
+
         //redirect
         return redirect()->route('admin.exam_sessions.show', $exam_session->id);
     }
@@ -231,7 +246,7 @@ class ExamSessionController extends Controller
     {
         //delete exam_group
         $exam_group->delete();
-        
+
         //redirect
         return redirect()->route('admin.exam_sessions.show', $exam_session->id);
     }

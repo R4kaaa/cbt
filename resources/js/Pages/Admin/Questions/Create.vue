@@ -101,7 +101,8 @@
                                                     :init="{
                                                         menubar: false,
                                                         plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
+                                                        setup: setupTinyMCEJapanese
                                                     }"
                                                 />
                                                 <div v-if="errors.question" class="mt-2 text-danger">
@@ -109,7 +110,6 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        <!-- Multiple Choice Options - Only show for single and multiple choice types -->
                                         <template v-if="form.question_type === 'single' || form.question_type === 'multiple'">
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan A</td>
@@ -121,7 +121,8 @@
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
+                                                            setup: setupTinyMCEJapanese
                                                         }"
                                                     />
                                                     <div v-if="errors.option_1" class="mt-2 text-danger">
@@ -139,7 +140,8 @@
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
+                                                            setup: setupTinyMCEJapanese
                                                         }"
                                                     />
                                                     <div v-if="errors.option_2" class="mt-2 text-danger">
@@ -157,7 +159,8 @@
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
+                                                            setup: setupTinyMCEJapanese
                                                         }"
                                                     />
                                                     <div v-if="errors.option_3" class="mt-2 text-danger">
@@ -175,7 +178,8 @@
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
+                                                            setup: setupTinyMCEJapanese
                                                         }"
                                                     />
                                                     <div v-if="errors.option_4" class="mt-2 text-danger">
@@ -193,7 +197,8 @@
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
+                                                            setup: setupTinyMCEJapanese
                                                         }"
                                                     />
                                                     <div v-if="errors.option_5" class="mt-2 text-danger">
@@ -255,7 +260,6 @@
                                                 </td>
                                             </tr>
                                         </template>
-                                        <!-- Essay Answer Key - Only show for essay type -->
                                         <tr v-if="form.question_type === 'essay'">
                                             <td style="width:20%" class="fw-bold">Kunci Jawaban Essay</td>
                                             <td>
@@ -266,7 +270,8 @@
                                                         height: 200,
                                                         menubar: false,
                                                         plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
+                                                        setup: setupTinyMCEJapanese
                                                     }"
                                                 />
                                                 <div v-if="errors.essay_answer" class="mt-2 text-danger">
@@ -290,163 +295,199 @@
 </template>
 
 <script>
-    //import layout
-    import LayoutAdmin from '../../../Layouts/Admin.vue';
+import LayoutAdmin from '../../../Layouts/Admin.vue';
+import {
+    Head,
+    Link
+} from '@inertiajs/inertia-vue3';
+import { reactive, ref } from 'vue';
+import { Inertia } from '@inertiajs/inertia';
+import Swal from 'sweetalert2';
+import Editor from '@tinymce/tinymce-vue';
 
-    //import Heade and Link from Inertia
-    import {
+export default {
+    layout: LayoutAdmin,
+    components: {
         Head,
-        Link
-    } from '@inertiajs/inertia-vue3';
+        Link,
+        Editor,
+    },
+    props: {
+        errors: Object,
+        exam: Object,
+    },
+    setup(props) {
+        const form = reactive({
+            question: '',
+            option_1: '',
+            option_2: '',
+            option_3: '',
+            option_4: '',
+            option_5: '',
+            question_type: 'single',
+            media_type: 'none',
+            answer: '1',
+            answers: [],
+            essay_answer: '',
+            question_image: null,
+            audio_file: null,
+        });
 
-    //import reactive from vue
-    import { reactive, ref } from 'vue';
+        const imagePreview = ref(null);
+        const audioPreview = ref(null);
 
-    //import inerita adapter
-    import { Inertia } from '@inertiajs/inertia';
+        const romajiToHiragana = {
+            'a': 'あ', 'i': 'い', 'u': 'う', 'e': 'え', 'o': 'お',
+            'ka': 'か', 'ki': 'き', 'ku': 'く', 'ke': 'け', 'ko': 'こ',
+            'ga': 'が', 'gi': 'ぎ', 'gu': 'ぐ', 'ge': 'げ', 'go': 'ご',
+            'sa': 'さ', 'shi': 'し', 'su': 'す', 'se': 'せ', 'so': 'そ',
+            'za': 'ざ', 'ji': 'じ', 'zu': 'ず', 'ze': 'ぜ', 'zo': 'ぞ',
+            'ta': 'た', 'chi': 'ち', 'tsu': 'つ', 'te': 'て', 'to': 'と',
+            'da': 'だ', 'di': 'ぢ', 'du': 'づ', 'de': 'で', 'do': 'ど',
+            'na': 'な', 'ni': 'に', 'nu': 'ぬ', 'ne': 'ね', 'no': 'の',
+            'ha': 'は', 'hi': 'ひ', 'hu': 'ふ', 'he': 'へ', 'ho': 'ほ',
+            'ba': 'ば', 'bi': 'び', 'bu': 'ぶ', 'be': 'べ', 'bo': 'ぼ',
+            'pa': 'ぱ', 'pi': 'ぴ', 'pu': 'ぷ', 'pe': 'ぺ', 'po': 'ぽ',
+            'ma': 'ま', 'mi': 'み', 'mu': 'む', 'me': 'め', 'mo': 'も',
+            'ya': 'や', 'yu': 'ゆ', 'yo': 'よ',
+            'ra': 'ら', 'ri': 'り', 'ru': 'る', 're': 'れ', 'ro': 'ろ',
+            'wa': 'わ', 'wi': 'ゐ', 'we': 'ゑ', 'wo': 'を', 'n': 'ん',
+            'kya': 'きゃ', 'kyu': 'きゅ', 'kyo': 'きょ',
+            'gya': 'ぎゃ', 'gyu': 'ぎゅ', 'gyo': 'ぎょ',
+            'sha': 'しゃ', 'shu': 'しゅ', 'sho': 'しょ',
+            'ja': 'じゃ', 'ju': 'じゅ', 'jo': 'じょ',
+            'cha': 'ちゃ', 'chu': 'ちゅ', 'cho': 'ちょ',
+            'nya': 'にゃ', 'nyu': 'にゅ', 'nyo': 'にょ',
+            'hya': 'ひゃ', 'hyu': 'ひゅ', 'hyo': 'ひょ',
+            'bya': 'びゃ', 'byu': 'びゅ', 'byo': 'びょ',
+            'pya': 'ぴゃ', 'pyu': 'ぴゅ', 'pyo': 'ぴょ',
+            'mya': 'みゃ', 'myu': 'みゅ', 'myo': 'みょ',
+            'rya': 'りゃ', 'ryu': 'りゅ', 'ryo': 'りょ',
+            'fu': 'ふ', 'si': 'し', 'ti': 'ち', 'tu': 'つ', 'zi': 'じ',
+            'nn': 'ん', 'xya': 'ゃ', 'xyu': 'ゅ', 'xyo': 'ょ',
+            'xa': 'ぁ', 'xi': 'ぃ', 'xu': 'ぅ', 'xe': 'ぇ', 'xo': 'ぉ',
+            'xtu': 'っ', 'xtsu': 'っ', 'ltu': 'っ', 'ltsu': 'っ',
+            'xwa': 'ゎ', 'xke': 'ゖ', 'xka': 'ゕ'
+        };
 
-    //import sweet alert2
-    import Swal from 'sweetalert2';
-
-    //import tinyMCE
-    import Editor from '@tinymce/tinymce-vue';
-
-    export default {
-
-        //layout
-        layout: LayoutAdmin,
-
-        //register components
-        components: {
-            Head,
-            Link,
-            Editor,
-        },
-
-        //props
-        props: {
-            errors: Object,
-            exam: Object,
-        },
-
-        //inisialisasi composition API
-        setup(props) {
-            // Define form with reactive
-            const form = reactive({
-                question: '',
-                option_1: '',
-                option_2: '',
-                option_3: '',
-                option_4: '',
-                option_5: '',
-                question_type: 'single', // Default to single
-                media_type: 'none', // Default to none
-                answer: '1', // Default to A
-                answers: [],
-                essay_answer: '', // For essay questions
-                question_image: null, // File object for image upload
-                audio_file: null, // File object for audio upload
-            });
-
-            // For image and audio preview
-            const imagePreview = ref(null);
-            const audioPreview = ref(null);
-
-            // Handle image upload
-            const handleImageUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Store file object in form data
-                    form.question_image = file;
-                    // Create preview URL
-                    imagePreview.value = URL.createObjectURL(file);
-                    // Reset audio file if an image is selected
-                    form.audio_file = null;
-                    audioPreview.value = null;
-                }
-            };
-
-            // Handle audio upload
-            const handleAudioUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Store file object in form data
-                    form.audio_file = file;
-                    // Create preview URL
-                    audioPreview.value = URL.createObjectURL(file);
-                    // Reset image file if audio is selected
-                    form.question_image = null;
-                    imagePreview.value = null;
-                }
-            };
-
-            // Method "submit" using FormData for file uploads
-            const submit = () => {
-                // Create FormData object
-                const formData = new FormData();
+        const convertToHiragana = (text) => {
+            let result = '';
+            let i = 0;
+            
+            while (i < text.length) {
+                let matched = false;
                 
-                // Append basic form fields
-                formData.append('question', form.question);
-                formData.append('question_type', form.question_type);
-                formData.append('media_type', form.media_type);
-                
-                // Handle options and answers based on question type
-                if (form.question_type === 'single' || form.question_type === 'multiple') {
-                    formData.append('option_1', form.option_1);
-                    formData.append('option_2', form.option_2);
-                    formData.append('option_3', form.option_3);
-                    formData.append('option_4', form.option_4);
-                    formData.append('option_5', form.option_5);
-                    
-                    if (form.question_type === 'single') {
-                        formData.append('answer', form.answer);
-                    } else {
-                        // Convert array to JSON string for multiple answers
-                        form.answers.forEach(answer => {
-                            formData.append('answers[]', answer);
-                        });
+                for (let len = 4; len >= 1; len--) {
+                    if (i + len <= text.length) {
+                        const substr = text.substring(i, i + len);
+                        if (romajiToHiragana[substr]) {
+                            result += romajiToHiragana[substr];
+                            i += len;
+                            matched = true;
+                            break;
+                        }
                     }
-                } else if (form.question_type === 'essay') {
-                    // If it's an essay, include the answer key
-                    formData.append('essay_answer', form.essay_answer);
                 }
                 
-                // Add files if they exist
-                if (form.media_type === 'image' && form.question_image) {
-                    formData.append('question_image', form.question_image);
+                if (!matched) {
+                    result += text[i];
+                    i++;
                 }
-                
-                if (form.media_type === 'audio' && form.audio_file) {
-                    formData.append('audio_file', form.audio_file);
-                }
-                
-                // Send data to server
-                Inertia.post(`/admin/exams/${props.exam.id}/questions/store`, formData, {
-                    forceFormData: true,
-                    onSuccess: () => {
-                        // Show success alert
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Soal Ujian Berhasil Disimpan!',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    },
-                });
-            };
+            }
+            
+            return result;
+        };
 
-            // Return variables and methods
-            return {
-                form,
-                imagePreview,
-                audioPreview,
-                handleImageUpload,
-                handleAudioUpload,
-                submit,
-            };
-        }
+        const setupTinyMCEJapanese = (editor) => {
+            editor.on('keyup', (e) => {
+                const content = editor.getContent({ format: 'text' });
+                const converted = convertToHiragana(content);
+                if (content !== converted) {
+                    const bookmark = editor.selection.getBookmark();
+                    editor.setContent(converted);
+                    editor.selection.moveToBookmark(bookmark);
+                }
+            });
+        };
+
+        const handleImageUpload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.question_image = file;
+                imagePreview.value = URL.createObjectURL(file);
+                form.audio_file = null;
+                audioPreview.value = null;
+            }
+        };
+
+        const handleAudioUpload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.audio_file = file;
+                audioPreview.value = URL.createObjectURL(file);
+                form.question_image = null;
+                imagePreview.value = null;
+            }
+        };
+
+        const submit = () => {
+            const formData = new FormData();
+            
+            formData.append('question', form.question);
+            formData.append('question_type', form.question_type);
+            formData.append('media_type', form.media_type);
+            
+            if (form.question_type === 'single' || form.question_type === 'multiple') {
+                formData.append('option_1', form.option_1);
+                formData.append('option_2', form.option_2);
+                formData.append('option_3', form.option_3);
+                formData.append('option_4', form.option_4);
+                formData.append('option_5', form.option_5);
+                
+                if (form.question_type === 'single') {
+                    formData.append('answer', form.answer);
+                } else {
+                    form.answers.forEach(answer => {
+                        formData.append('answers[]', answer);
+                    });
+                }
+            } else if (form.question_type === 'essay') {
+                formData.append('essay_answer', form.essay_answer);
+            }
+            
+            if (form.media_type === 'image' && form.question_image) {
+                formData.append('question_image', form.question_image);
+            }
+            
+            if (form.media_type === 'audio' && form.audio_file) {
+                formData.append('audio_file', form.audio_file);
+            }
+            
+            Inertia.post(`/admin/exams/${props.exam.id}/questions/store`, formData, {
+                forceFormData: true,
+                onSuccess: () => {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Soal Ujian Berhasil Disimpan!',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+            });
+        };
+
+        return {
+            form,
+            imagePreview,
+            audioPreview,
+            handleImageUpload,
+            handleAudioUpload,
+            setupTinyMCEJapanese,
+            submit,
+        };
     }
+}
 </script>
 
 <style>

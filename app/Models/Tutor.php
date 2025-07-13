@@ -3,18 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class Tutor extends Authenticatable
 {
     use HasFactory, Notifiable;
 
     protected $fillable = [
+        'user_id',
         'name',
+        'nip',
         'email',
+        'phone',
+        'gender',
         'password',
-        'role',
     ];
 
     protected $hidden = [
@@ -27,26 +31,10 @@ class User extends Authenticatable
     ];
 
     /**
-     * Check if user is admin
+     * Relationship with User model
      */
-    public function isAdmin()
+    public function user()
     {
-        return $this->role === 1;
-    }
-
-    /**
-     * Check if user is tutor
-     */
-    public function isTutor()
-    {
-        return $this->role === 2;
-    }
-
-    /**
-     * Relationship with Tutor model
-     */
-    public function tutor()
-    {
-        return $this->hasOne(Tutor::class);
+        return $this->belongsTo(User::class);
     }
 }

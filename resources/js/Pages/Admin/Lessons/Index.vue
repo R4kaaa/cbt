@@ -1,6 +1,6 @@
 <template>
     <Head>
-        <title>Mata Pelajaran - Aplikasi Ujian Online</title>
+        <title>Materi - Aplikasi Ujian Online</title>
     </Head>
     <div class="container-fluid mb-5 mt-5">
         <div class="row">
@@ -35,7 +35,8 @@
                                 <thead class="thead-dark">
                                     <tr class="border-0">
                                         <th class="border-0 rounded-start" style="width:5%">No.</th>
-                                        <th class="border-0">Nama Mata Pelajaran</th>
+                                        <th class="border-0">Nama Materi</th>
+                                        <th class="border-0">Skor KKM</th>
                                         <th class="border-0 rounded-end" style="width:15%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -44,6 +45,7 @@
                                     <tr v-for="(lesson, index) in lessons.data" :key="index">
                                         <td class="fw-bold text-center">{{ ++index + (lessons.current_page - 1) * lessons.per_page }}</td>
                                         <td>{{ lesson.title }}</td>
+                                        <td>{{ lesson.kkm }}</td>
                                         <td class="text-center">
                                             <Link :href="`/admin/lessons/${lesson.id}/edit`" class="btn btn-sm btn-info border-0 shadow me-2" type="button"><i class="fa fa-pencil-alt"></i></Link>
                                             <button @click.prevent="destroy(lesson.id)" class="btn btn-sm btn-danger border-0"><i class="fa fa-trash"></i></button>
@@ -133,7 +135,7 @@
 
                         Swal.fire({
                             title: 'Deleted!',
-                            text: 'Pelajaran Berhasil Dihapus!.',
+                            text: 'Materi Berhasil Dihapus!.',
                             icon: 'success',
                             timer: 2000,
                             showConfirmButton: false,

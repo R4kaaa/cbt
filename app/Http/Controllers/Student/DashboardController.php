@@ -9,34 +9,28 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function __invoke(Request $request)
     {
-        //get exam groups
-        $exam_groups = ExamGroup::with('exam.lesson', 'exam_session', 'student.classroom')
+        // Ambil exam_groups dengan relasi yang diperlukan
+        $exam_groups = ExamGroup::with([
+            'exam.lesson',
+            'exam_session',
+            'student.classroom'
+        ])
             ->where('student_id', auth()->guard('student')->user()->id)
             ->get();
 
-        //define variable array
         $data = [];
 
-        //get nilai
-        foreach($exam_groups as $exam_group) {
-            
-            //get data nilai / grade
+        foreach ($exam_groups as $exam_group) {
+            // Cek apakah sudah ada grade untuk ujian ini
             $grade = Grade::where('exam_id', $exam_group->exam_id)
                 ->where('student_id', auth()->guard('student')->user()->id)
+                ->where('exam_session_id', $exam_group->exam_session_id) // Tambahkan kondisi session
                 ->first();
 
-            //jika nilai / grade kosong, maka buat baru
-            if($grade == null) {
-
-                //create defaul grade
+            // Jika belum ada grade, buat grade baru
+            if ($grade == null) {
                 $grade = new Grade();
                 $grade->exam_id         = $exam_group->exam_id;
                 $grade->exam_session_id = $exam_group->exam_session_id;
@@ -45,17 +39,15 @@ class DashboardController extends Controller
                 $grade->total_correct   = 0;
                 $grade->grade           = 0;
                 $grade->save();
-
             }
 
+            // Struktur data yang akan dikirim ke frontend
             $data[] = [
                 'exam_group' => $exam_group,
                 'grade'      => $grade
             ];
-
         }
 
-        //return with inertia
         return inertia('Student/Dashboard/Index', [
             'exam_groups' => $data,
         ]);

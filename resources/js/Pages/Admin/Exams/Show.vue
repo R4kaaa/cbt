@@ -20,7 +20,7 @@
                                         <td>{{ exam.title }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">Mata Pelajaran</td>
+                                        <td class="fw-bold">Materi</td>
                                         <td>{{ exam.lesson.title }}</td>
                                     </tr>
                                     <tr>

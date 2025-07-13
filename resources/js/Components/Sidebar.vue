@@ -33,14 +33,17 @@
                             <span class="sidebar-text fw-bold">UJIAN ONLINE</span>
                         </span>
                         <span>
-                            <span class="badge badge-sm bg-secondary ms-1 text-gray-800">ADMIN</span>
+                            <span class="badge badge-sm bg-secondary ms-1 text-gray-800">
+                                {{ userRole }}
+                            </span>
                         </span>
                     </span>
                 </li>
 
                 <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
 
-                <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/dashboard') }">
+                <!-- Dashboard - Only Admin -->
+                <li v-if="isAdmin" class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/dashboard') }">
                     <Link href="/admin/dashboard" class="nav-link d-flex justify-content-between">
                     <span>
                         <span class="sidebar-icon">
@@ -57,8 +60,10 @@
                     </Link>
                 </li>
 
-                <li role="separator" class="dropdown-divider mt-2 mb-2 border-gray-700"></li>
+                <li v-if="isAdmin" role="separator" class="dropdown-divider mt-2 mb-2 border-gray-700">
+                </li>
 
+                <!-- Kelola Materi - Both Admin and Tutor -->
                 <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/lessons') }">
                     <Link href="/admin/lessons" class="nav-link d-flex justify-content-between">
                     <span>
@@ -71,12 +76,13 @@
                                     d="M4.268 1H12a1 1 0 0 1 1 1v11.768l.223.148A.5.5 0 0 0 14 13.5V2a2 2 0 0 0-2-2H6a2 2 0 0 0-1.732 1z" />
                             </svg>
                         </span>
-                        <span class="sidebar-text">Mata Pelajaran</span>
+                        <span class="sidebar-text">Kelola Materi</span>
                     </span>
                     </Link>
                 </li>
 
-                <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/classrooms') }">
+                <!-- Kelas - Only Admin -->
+                <li v-if="isAdmin" class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/classrooms') }">
                     <Link href="/admin/classrooms" class="nav-link d-flex justify-content-between">
                     <span>
                         <span class="sidebar-icon">
@@ -91,7 +97,8 @@
                     </Link>
                 </li>
 
-                <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/students') }">
+                <!-- Siswa - Only Admin -->
+                <li v-if="isAdmin" class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/students') }">
                     <Link href="/admin/students" class="nav-link d-flex justify-content-between">
                     <span>
                         <span class="sidebar-icon">
@@ -108,8 +115,27 @@
                     </Link>
                 </li>
 
+                <!-- Tutor - Only Admin -->
+                <li v-if="isAdmin" class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/tutors') }">
+                    <Link href="/admin/tutors" class="nav-link d-flex justify-content-between">
+                    <span>
+                        <span class="sidebar-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                                class="bi bi-people-fill icon icon-xs me-2" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                                <path fill-rule="evenodd"
+                                    d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z" />
+                                <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
+                            </svg>
+                        </span>
+                        <span class="sidebar-text">Tutor</span>
+                    </span>
+                    </Link>
+                </li>
+
                 <li role="separator" class="dropdown-divider mt-2 mb-2 border-gray-700"></li>
 
+                <!-- Ujian - Both Admin and Tutor -->
                 <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/exams') }">
                     <Link href="/admin/exams" class="nav-link d-flex justify-content-between">
                     <span>
@@ -127,7 +153,8 @@
                     </Link>
                 </li>
 
-                <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/exam_sessions') }">
+                <!-- Sesi Ujian - Only Admin -->
+                <li v-if="isAdmin" class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/exam_sessions') }">
                     <Link href="/admin/exam_sessions" class="nav-link d-flex justify-content-between">
                     <span>
                         <span class="sidebar-icon">
@@ -145,6 +172,7 @@
 
                 <li role="separator" class="dropdown-divider mt-2 mb-2 border-gray-700"></li>
 
+                <!-- Laporan Nilai - Both Admin and Tutor -->
                 <li class="nav-item" :class="{ 'active': $page.url.startsWith('/admin/reports') }">
                     <Link href="/admin/reports" class="nav-link d-flex justify-content-between">
                     <span>
@@ -166,20 +194,38 @@
 </template>
 
 <script>
-
 //import Link
 import { Link } from '@inertiajs/inertia-vue3';
 
 export default {
-
     //register components
     components: {
         Link
     },
 
-}
+    //props
+    props: {
+        auth: {
+            type: Object,
+            default: () => ({
+                user: {
+                    role: null
+                }
+            })
+        }
+    },
 
+    computed: {
+        isAdmin() {
+            return this.auth?.user?.role === 1;
+        },
+
+        userRole() {
+            if (!this.auth?.user?.role) return 'TUTOR';
+            return this.auth.user.role === 1 ? 'ADMIN' : 'TUTOR';
+        }
+    }
+}
 </script>
 
-<style>
-</style>
+<style></style>

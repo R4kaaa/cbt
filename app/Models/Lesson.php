@@ -16,5 +16,6 @@ class Lesson extends Model
      */
     protected $fillable = [
         'title',
+        'kkm'
     ];
 }

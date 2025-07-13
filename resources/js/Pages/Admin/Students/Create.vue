@@ -16,9 +16,9 @@
                                 <div class="col-md-6">
                                     <div class="mb-4">
                                         <label>NIK</label> 
-                                        <input type="text" class="form-control" placeholder="Masukkan NIK Peserta" v-model="form.nisn">
-                                        <div v-if="errors.nisn" class="alert alert-danger mt-2">
-                                            {{ errors.nisn }}
+                                        <input type="text" class="form-control" placeholder="Masukkan NIK Peserta" v-model="form.nik">
+                                        <div v-if="errors.nik" class="alert alert-danger mt-2">
+                                            {{ errors.nik }}
                                         </div>
                                     </div>
                                 </div>
@@ -150,7 +150,7 @@
 
             //define form with reactive
             const form = reactive({
-                nisn: '',
+                nik: '',
                 name: '',
                 email: '',
                 phone: '',
@@ -166,7 +166,7 @@
                 //send data to server
                 Inertia.post('/admin/students', {
                     //data
-                    nisn: form.nisn,
+                    nik: form.nik,
                     name: form.name,
                     email: form.email,
                     phone: form.phone,

@@ -39,12 +39,6 @@ class ExamController extends Controller
         ]);
     }
 
-    /**
-     * startExam
-     *
-     * @param  mixed $id
-     * @return void
-     */
     public function startExam($id)
     {
         //get exam group
@@ -63,16 +57,26 @@ class ExamController extends Controller
         $grade->start_time = Carbon::now();
         $grade->update();
 
-        //cek apakah questions / soal ujian di random
+        // Get questions berdasarkan urutan tipe: single -> multiple -> essay
+        $questions_single = Question::where('exam_id', $exam_group->exam->id)
+            ->where('question_type', 'single');
+        $questions_multiple = Question::where('exam_id', $exam_group->exam->id)
+            ->where('question_type', 'multiple');
+        $questions_essay = Question::where('exam_id', $exam_group->exam->id)
+            ->where('question_type', 'essay');
+
+        // Terapkan random jika diaktifkan, tapi per tipe soal
         if ($exam_group->exam->random_question == 'Y') {
-
-            //get questions / soal ujian
-            $questions = Question::where('exam_id', $exam_group->exam->id)->inRandomOrder()->get();
-        } else {
-
-            //get questions / soal ujian
-            $questions = Question::where('exam_id', $exam_group->exam->id)->get();
+            $questions_single = $questions_single->inRandomOrder();
+            $questions_multiple = $questions_multiple->inRandomOrder();
+            $questions_essay = $questions_essay->inRandomOrder();
         }
+
+        // Gabungkan semua soal dengan urutan: single -> multiple -> essay
+        $questions = collect()
+            ->merge($questions_single->get())
+            ->merge($questions_multiple->get())
+            ->merge($questions_essay->get());
 
         //define pilihan jawaban default
         $question_order = 1;
@@ -85,8 +89,8 @@ class ExamController extends Controller
             if (!empty($question->option_4)) $options[] = 4;
             if (!empty($question->option_5)) $options[] = 5;
 
-            //acak jawaban / answer
-            if ($exam_group->exam->random_answer == 'Y') {
+            //acak jawaban / answer (hanya untuk single dan multiple choice)
+            if ($exam_group->exam->random_answer == 'Y' && in_array($question->question_type, ['single', 'multiple'])) {
                 shuffle($options);
             }
 
@@ -112,9 +116,10 @@ class ExamController extends Controller
                     'question_id'       => $question->id,
                     'student_id'        => auth()->guard('student')->user()->id,
                     'question_order'    => $question_order,
-                    'answer_order'      => implode(",", $options),
+                    'answer_order'      => $question->question_type === 'essay' ? '' : implode(",", $options),
                     'answer'            => 0,
                     'selected_answers'  => json_encode([]), // Untuk multiple choice
+                    'essay_answer'      => '', // Untuk essay
                     'is_correct'        => 'N',
                     'score'             => 0 // Tambahkan field skor
                 ]);
@@ -129,13 +134,6 @@ class ExamController extends Controller
         ]);
     }
 
-    /**
-     * show
-     *
-     * @param  mixed $id
-     * @param  mixed $page
-     * @return void
-     */
     public function show($id, $page)
     {
         //get exam group
@@ -148,33 +146,52 @@ class ExamController extends Controller
             return redirect()->route('student.dashboard');
         }
 
-        //get all questions
-        $all_questions = Answer::with('question')
+        //get all questions dengan urutan berdasarkan question_order
+        $all_questions = Answer::with(['question' => function ($query) {
+            $query->select('id', 'exam_id', 'question', 'question_type', 'media_type', 'question_image', 'audio_file', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5');
+        }])
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('exam_id', $exam_group->exam->id)
             ->orderBy('question_order', 'ASC')
             ->get();
 
-        //count all question answered
+        //count all question answered berdasarkan tipe soal
         $question_answered = Answer::with('question')
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('exam_id', $exam_group->exam->id)
             ->where(function ($query) {
-                $query->where('answer', '!=', 0)
-                    ->orWhereNotNull('selected_answers')
-                    ->whereRaw("selected_answers != '[]'");
+                $query->where(function ($q) {
+                    // Single choice: answer != 0
+                    $q->whereHas('question', function ($qq) {
+                        $qq->where('question_type', 'single');
+                    })->where('answer', '!=', 0);
+                })->orWhere(function ($q) {
+                    // Multiple choice: selected_answers not empty
+                    $q->whereHas('question', function ($qq) {
+                        $qq->where('question_type', 'multiple');
+                    })->whereNotNull('selected_answers')
+                        ->whereRaw("selected_answers != '[]'");
+                })->orWhere(function ($q) {
+                    // Essay: essay_answer not empty
+                    $q->whereHas('question', function ($qq) {
+                        $qq->where('question_type', 'essay');
+                    })->whereNotNull('essay_answer')
+                        ->where('essay_answer', '!=', '');
+                });
             })
             ->count();
 
         //get question active
-        $question_active = Answer::with('question.exam')
+        $question_active = Answer::with(['question' => function ($query) {
+            $query->with('exam');
+        }])
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('exam_id', $exam_group->exam->id)
             ->where('question_order', $page)
             ->first();
 
-        //explode atau pecah jawaban
-        if ($question_active) {
+        //explode atau pecah jawaban (hanya untuk single dan multiple choice)
+        if ($question_active && in_array($question_active->question->question_type, ['single', 'multiple'])) {
             $answer_order = explode(",", $question_active->answer_order);
         } else {
             $answer_order = [];
@@ -198,7 +215,6 @@ class ExamController extends Controller
             'duration'          => $duration,
         ]);
     }
-
     public function updateDuration(Request $request, $grade_id)
     {
         $grade = Grade::find($grade_id);
@@ -381,10 +397,13 @@ class ExamController extends Controller
         $student = auth()->guard('student')->user();
         $exam_group = ExamGroup::with('exam.lesson')->find($request->exam_group_id);
 
+        // Get KKM from lesson
+        $kkm = $exam_group->exam->lesson->kkm;
+
         // Enhanced message with partial correct info
         $message = "*Hasil Ujian*\n\n"
             . "*Nama Siswa*: " . $student->name . "\n"
-            . "*Mata Pelajaran*: " . $exam_group->exam->title . "\n"
+            . "*Materi*: " . $exam_group->exam->title . "\n"
             . "*Jumlah Soal*: " . $count_question . "\n"
             . "*Jawaban Benar*: " . $count_correct_answer . "\n";
 
@@ -394,8 +413,23 @@ class ExamController extends Controller
         }
 
         $message .= "*Total Skor*: " . $total_score . " dari " . $count_question . "\n"
-            . "*Nilai Akhir*: " . $grade_exam . "\n\n"
-            . "Selamat atas hasil ujianmu!";
+            . "*Nilai Akhir*: " . $grade_exam . "\n"
+            . "*KKM*: " . $kkm . "\n\n";
+
+        // Check if grade meets KKM and add appropriate message
+        if ($grade_exam >= $kkm) {
+            $message .= "🎉 *Selamat!* 🎉\n"
+                . "Kamu berhasil mencapai KKM dengan nilai yang sangat baik! "
+                . "Pertahankan semangat belajarmu dan terus tingkatkan prestasi. "
+                . "Kerja keras dan dedikasimu membuahkan hasil yang membanggakan!";
+        } else {
+            $message .= "💪 *Jangan Menyerah!* 💪\n"
+                . "Nilai kamu belum mencapai KKM, tapi ini bukan akhir dari segalanya. "
+                . "Setiap kegagalan adalah kesempatan untuk belajar dan berkembang. "
+                . "Pelajari kembali materi yang kurang dipahami, berlatih lebih giat, "
+                . "dan yakinlah bahwa usaha yang konsisten akan membawa hasil yang memuaskan. "
+                . "Semangat terus, kesuksesan menanti di depan! 🌟";
+        }
 
         // Send WhatsApp message
         $receiver = $student->phone;
@@ -460,6 +494,159 @@ class ExamController extends Controller
         return inertia('Student/Exams/Result', [
             'exam_group' => $exam_group,
             'grade'      => $grade,
+        ]);
+    }
+    public function history($student_id = null)
+    {
+        if (!$student_id) {
+            $student_id = auth()->guard('student')->user()->id;
+        }
+
+      
+        $exam_history = ExamGroup::with([
+            'exam.lesson',
+            'exam_session',
+            'student.classroom',
+            'grade' => function ($query) use ($student_id) {
+                $query->where('student_id', $student_id);
+            }
+        ])
+            ->where('student_id', $student_id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($exam_group) use ($student_id) {
+         
+                $grade = Grade::where('exam_id', $exam_group->exam->id)
+                    ->where('exam_session_id', $exam_group->exam_session->id)
+                    ->where('student_id', $student_id)
+                    ->first();
+
+            
+                $answers = Answer::with('question')
+                    ->where('exam_id', $exam_group->exam->id)
+                    ->where('exam_session_id', $exam_group->exam_session->id)
+                    ->where('student_id', $student_id)
+                    ->get();
+
+               
+                $stats = [
+                    'total_questions' => $answers->count(),
+                    'single_choice' => [
+                        'total' => $answers->where('question.question_type', 'single')->count(),
+                        'correct' => $answers->where('question.question_type', 'single')->where('is_correct', 'Y')->count(),
+                        'wrong' => $answers->where('question.question_type', 'single')->where('is_correct', 'N')->count(),
+                    ],
+                    'multiple_choice' => [
+                        'total' => $answers->where('question.question_type', 'multiple')->count(),
+                        'correct' => $answers->where('question.question_type', 'multiple')->where('is_correct', 'Y')->count(),
+                        'partial' => $answers->where('question.question_type', 'multiple')->where('is_correct', 'P')->count(),
+                        'wrong' => $answers->where('question.question_type', 'multiple')->where('is_correct', 'N')->count(),
+                    ],
+                    'essay' => [
+                        'total' => $answers->where('question.question_type', 'essay')->count(),
+                        'correct' => $answers->where('question.question_type', 'essay')->where('is_correct', 'Y')->count(),
+                        'partial' => $answers->where('question.question_type', 'essay')->where('is_correct', 'P')->count(),
+                        'wrong' => $answers->where('question.question_type', 'essay')->where('is_correct', 'N')->count(),
+                    ]
+                ];
+
+      
+                $status = 'not_started';
+                if ($grade) {
+                    if ($grade->end_time) {
+                        $status = 'completed';
+                    } else if ($grade->start_time) {
+                        $status = 'in_progress';
+                    }
+                }
+
+                
+                $duration_taken = null;
+                if ($grade && $grade->start_time && $grade->end_time) {
+                    $start = Carbon::parse($grade->start_time);
+                    $end = Carbon::parse($grade->end_time);
+                    $duration_taken = $end->diffInMinutes($start);
+                }
+
+                $passed = false;
+                if ($grade && $grade->grade >= $exam_group->exam->lesson->kkm) {
+                    $passed = true;
+                }
+
+                return [
+                    'exam_group' => $exam_group,
+                    'grade' => $grade,
+                    'stats' => $stats,
+                    'status' => $status,
+                    'duration_taken' => $duration_taken,
+                    'passed' => $passed,
+                    'exam_date' => $exam_group->created_at->format('d/m/Y H:i'),
+                ];
+            });
+        $overall_stats = [
+            'total_exams' => $exam_history->count(),
+            'completed_exams' => $exam_history->where('status', 'completed')->count(),
+            'passed_exams' => $exam_history->where('passed', true)->count(),
+            'average_score' => $exam_history->where('status', 'completed')->avg('grade.grade') ?? 0,
+            'highest_score' => $exam_history->where('status', 'completed')->max('grade.grade') ?? 0,
+            'lowest_score' => $exam_history->where('status', 'completed')->min('grade.grade') ?? 0,
+        ];
+
+        $student = auth()->guard('student')->user();
+
+        return inertia('Student/Exams/History', [
+            'student' => $student,
+            'exam_history' => $exam_history,
+            'overall_stats' => $overall_stats,
+        ]);
+    }
+
+    public function historyDetail($exam_group_id)
+    {
+        $student_id = auth()->guard('student')->user()->id;
+        $exam_group = ExamGroup::with([
+            'exam.lesson',
+            'exam_session',
+            'student.classroom'
+        ])
+            ->where('id', $exam_group_id)
+            ->where('student_id', $student_id)
+            ->first();
+
+        if (!$exam_group) {
+            return redirect()->route('student.exams.history');
+        }
+        $grade = Grade::where('exam_id', $exam_group->exam->id)
+            ->where('exam_session_id', $exam_group->exam_session->id)
+            ->where('student_id', $student_id)
+            ->first();
+        $answers = Answer::with(['question' => function ($query) {
+            $query->select('id', 'exam_id', 'question', 'question_type', 'media_type', 'question_image', 'audio_file', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5', 'answer', 'answers', 'essay_answer');
+        }])
+            ->where('exam_id', $exam_group->exam->id)
+            ->where('exam_session_id', $exam_group->exam_session->id)
+            ->where('student_id', $student_id)
+            ->orderBy('question_order', 'ASC')
+            ->get()
+            ->map(function ($answer) {
+                if ($answer->question->question_type === 'multiple') {
+                    $answer->selected_answers_decoded = json_decode($answer->selected_answers, true) ?? [];
+                    $answer->correct_answers = is_array($answer->question->answers) ?
+                        $answer->question->answers :
+                        json_decode($answer->question->answers, true) ?? [];
+                }
+
+                if (in_array($answer->question->question_type, ['single', 'multiple'])) {
+                    $answer->answer_order_array = explode(',', $answer->answer_order);
+                }
+
+                return $answer;
+            });
+
+        return inertia('Student/Exams/HistoryDetail', [
+            'exam_group' => $exam_group,
+            'grade' => $grade,
+            'answers' => $answers,
         ]);
     }
 }

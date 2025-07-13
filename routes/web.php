@@ -8,6 +8,15 @@ Route::prefix('admin')->group(function () {
     //middleware "auth"
     Route::group(['middleware' => ['auth']], function () {
 
+        Route::resource('tutors', App\Http\Controllers\Admin\TutorController::class)->names([
+            'index' => 'admin.tutors.index',
+            'create' => 'admin.tutors.create',
+            'store' => 'admin.tutors.store',
+            'show' => 'admin.tutors.show',
+            'edit' => 'admin.tutors.edit',
+            'update' => 'admin.tutors.update',
+            'destroy' => 'admin.tutors.destroy',
+        ]);
         //route dashboard
         Route::get('/dashboard', App\Http\Controllers\Admin\DashboardController::class)->name('admin.dashboard');
 
@@ -104,6 +113,9 @@ Route::prefix('student')->group(function () {
         //route exam confirmation
         Route::get('/exam-confirmation/{id}', [App\Http\Controllers\Student\ExamController::class, 'confirmation'])->name('student.exams.confirmation');
 
+        Route::get('/profile-index/{id}', [App\Http\Controllers\Student\ProfileController::class, 'index'])->name('student.profile.index');
+        Route::put('/profile/update/{id}', [App\Http\Controllers\Student\ProfileController::class, 'update'])->name('student.profile.update');
+
         //route exam start
         Route::get('/exam-start/{id}', [App\Http\Controllers\Student\ExamController::class, 'startExam'])->name('student.exams.startExam');
 
@@ -119,6 +131,9 @@ Route::prefix('student')->group(function () {
         //route exam end
         Route::post('/exam-end', [App\Http\Controllers\Student\ExamController::class, 'endExam'])->name('student.exams.endExam');
 
+        Route::get('exam-history', [App\Http\Controllers\Student\ExamController::class, 'history'])->name('student.exams.history');
+        Route::get('exam-history/{student_id}', [App\Http\Controllers\Student\ExamController::class, 'history'])->name('student.exams.history.student');
+        Route::get('exam-history-detail/{exam_group_id}', [App\Http\Controllers\Student\ExamController::class, 'historyDetail'])->name('student.exams.history.detail');
         //route exam result
         Route::get('/exam-result/{exam_group_id}', [App\Http\Controllers\Student\ExamController::class, 'resultExam'])->name('student.exams.resultExam');
     });

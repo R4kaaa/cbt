@@ -11,34 +11,41 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //get students
+        //get all classrooms for filter dropdown
+        $classrooms = Classroom::all();
+
+        //get students with filters
         $students = Student::when(request()->q, function ($students) {
             $students = $students->where('name', 'like', '%' . request()->q . '%')
                 ->orWhere('email', 'like', '%' . request()->q . '%')
                 ->orWhere('nisn', 'like', '%' . request()->q . '%');
-        })->with('classroom')->latest()->paginate(5);
+        })
+            ->when(request()->classroom_id, function ($students) {
+                $students = $students->where('classroom_id', request()->classroom_id);
+            })
+            ->with('classroom')
+            ->latest()
+            ->paginate(5);
 
         //append query string to pagination links
-        $students->appends(['q' => request()->q]);
+        $students->appends([
+            'q' => request()->q,
+            'classroom_id' => request()->classroom_id
+        ]);
 
         //render with inertia
         return inertia('Admin/Students/Index', [
             'students' => $students,
+            'classrooms' => $classrooms,
+            'filters' => [
+                'q' => request()->q,
+                'classroom_id' => request()->classroom_id
+            ]
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //get classrooms
@@ -50,29 +57,24 @@ class StudentController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //validate request
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'nisn'          => 'required|unique:students',
-            'email'         => 'nullable|email|unique:students',
-            'phone'         => 'nullable|string|max:20',
-            'gender'        => 'required|string',
-            'password'      => 'required|confirmed',
-            'classroom_id'  => 'required'
+            'nik' => 'required|size:16|unique:students,nisn',
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|unique:students',
+            'phone' => 'nullable|string|max:20',
+            'gender' => 'required|string',
+            'password' => 'required|confirmed',
+            'classroom_id' => 'required'
         ]);
+
 
         //create student
         Student::create([
             'name'          => $request->name,
-            'nisn'          => $request->nisn,
+            'nisn'          => $request->nik,
             'email'         => $request->email,
             'phone'         => $request->phone,
             'gender'        => $request->gender,
@@ -105,19 +107,13 @@ class StudentController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Student $student)
     {
+        // dd($student->id);
         //validate request
         $request->validate([
             'name'          => 'required|string|max:255',
-            'nisn'          => 'required|unique:students,nisn,' . $student->id,
+            'nisn'          => 'required|size:16|unique:students,nisn,' . $student->id,
             'email'         => 'nullable|email|unique:students,email,' . $student->id,
             'phone'         => 'nullable|string|max:20',
             'gender'        => 'required|string',
@@ -153,12 +149,6 @@ class StudentController extends Controller
         return redirect()->route('admin.students.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //get student
@@ -171,22 +161,11 @@ class StudentController extends Controller
         return redirect()->route('admin.students.index');
     }
 
-    /**
-     * import
-     *
-     * @return void
-     */
     public function import()
     {
         return inertia('Admin/Students/Import');
     }
 
-    /**
-     * storeImport
-     *
-     * @param  mixed $request
-     * @return void
-     */
     public function storeImport(Request $request)
     {
         $this->validate($request, [
