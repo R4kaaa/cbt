@@ -1,4 +1,5 @@
 <template>
+
     <Head>
         <title>Login Siswa - Aplikasi Ujian Online</title>
     </Head>
@@ -13,15 +14,15 @@
                 </div>
                 <form @submit.prevent="submit" class="mt-4">
                     <div class="form-group mb-4">
-                        <label for="email">Nomor Test</label>
+                        <label for="email">NIK</label>
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon1">
                                 <i class="fa fa-key"></i>
                             </span>
-                            <input type="number" class="form-control" v-model="form.nisn" placeholder="Nomor Test">
+                            <input type="number" class="form-control" v-model="form.nik" placeholder="Nomor Test">
                         </div>
-                        <div v-if="errors.nisn" class="alert alert-danger mt-2">
-                            {{ errors.nisn }}
+                        <div v-if="errors.nik" class="alert alert-danger mt-2">
+                            {{ errors.nik }}
                         </div>
                     </div>
 
@@ -49,13 +50,15 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="d-grid mb-3">
                         <button type="submit" class="btn btn-gray-800">LOGIN</button>
                     </div>
 
                     <div class="text-center">
-                        <p>Belum punya akun? <Link href="/register" class="text-primary">Daftar Sekarang</Link></p>
+                        <p>Belum punya akun?
+                            <Link href="/register" class="text-primary">Daftar Sekarang</Link>
+                        </p>
                     </div>
                 </form>
             </div>
@@ -64,66 +67,65 @@
 </template>
 
 <script>
-    //import layout
-    import LayoutStudent from '../../../Layouts/Student.vue';
+//import layout
+import LayoutStudent from '../../../Layouts/Student.vue';
 
-    //import Head from Inertia
-    import {
+//import Head from Inertia
+import {
+    Head,
+    Link
+} from '@inertiajs/inertia-vue3';
+
+//import reactive
+import {
+    reactive
+} from 'vue';
+
+//import inertia adapter
+import {
+    Inertia
+} from '@inertiajs/inertia';
+
+export default {
+    //layout
+    layout: LayoutStudent,
+
+    //register component
+    components: {
         Head,
         Link
-    } from '@inertiajs/inertia-vue3';
+    },
 
-    //import reactive
-    import {
-        reactive
-    } from 'vue';
+    //props
+    props: {
+        errors: Object,
+    },
 
-    //import inertia adapter
-    import {
-        Inertia
-    } from '@inertiajs/inertia';
+    //inisialisasi composition API
+    setup() {
+        //define form state
+        const form = reactive({
+            nik: '',
+            password: '',
+        });
 
-    export default {
-        //layout
-        layout: LayoutStudent,
-
-        //register component
-        components: {
-            Head,
-            Link
-        },
-
-        //props
-        props: {
-            errors: Object,
-        },
-
-        //inisialisasi composition API
-        setup() {
-            //define form state
-            const form = reactive({
-                nisn: '',
-                password: '',
+        //submit method
+        const submit = () => {
+            //send data to server
+            Inertia.post('/students/login', {
+                //data
+                nik: form.nik,
+                password: form.password,
             });
+        }
 
-            //submit method
-            const submit = () => {
-                //send data to server
-                Inertia.post('/students/login', {
-                    //data
-                    nisn: form.nisn,
-                    password: form.password,
-                });
-            }
-
-            //return
-            return {
-                form,
-                submit
-            }
+        //return
+        return {
+            form,
+            submit
         }
     }
+}
 </script>
 
-<style>
-</style>
+<style></style>

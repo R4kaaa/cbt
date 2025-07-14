@@ -128,7 +128,7 @@
                                 <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
                             </svg>
                         </span>
-                        <span class="sidebar-text">Tutor</span>
+                        <span class="sidebar-text">Guru</span>
                     </span>
                     </Link>
                 </li>
@@ -192,10 +192,10 @@
         </div>
     </nav>
 </template>
-
 <script>
 //import Link
 import { Link } from '@inertiajs/inertia-vue3';
+import { usePage } from '@inertiajs/inertia-vue3';
 
 export default {
     //register components
@@ -203,27 +203,31 @@ export default {
         Link
     },
 
-    //props
-    props: {
-        auth: {
-            type: Object,
-            default: () => ({
-                user: {
-                    role: null
-                }
-            })
-        }
-    },
-
+    //computed properties
     computed: {
+        // Get auth data from Inertia's shared props
+        auth() {
+            return usePage().props.value.auth;
+        },
+
         isAdmin() {
+            // Check if user exists and role is 1 (admin)
             return this.auth?.user?.role === 1;
         },
 
         userRole() {
-            if (!this.auth?.user?.role) return 'TUTOR';
+            // Return role based on user role value
+            if (!this.auth?.user) return 'GUEST';
             return this.auth.user.role === 1 ? 'ADMIN' : 'TUTOR';
         }
+    },
+
+    mounted() {
+        // Debug: Log the auth data to see what's being passed
+        console.log('Auth data:', this.auth);
+        console.log('User role:', this.auth?.user?.role);
+        console.log('Is Admin:', this.isAdmin);
+        console.log('User Role String:', this.userRole);
     }
 }
 </script>

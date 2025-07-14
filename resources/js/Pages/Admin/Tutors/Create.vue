@@ -1,7 +1,7 @@
 <template>
 
     <Head>
-        <title>Tambah Tutor - Aplikasi Ujian Online</title>
+        <title>Tambah Guru - Aplikasi Ujian Online</title>
     </Head>
     <div class="container-fluid mb-5 mt-5">
         <div class="row">
@@ -10,7 +10,7 @@
                     class="fa fa-long-arrow-alt-left me-2"></i> Kembali</Link>
                 <div class="card border-0 shadow">
                     <div class="card-body">
-                        <h5><i class="fa fa-user-tie"></i> Tambah Tutor</h5>
+                        <h5><i class="fa fa-user-tie"></i> Tambah Guru</h5>
                         <hr>
                         <form @submit.prevent="submit">
                             <div class="row">
@@ -27,7 +27,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-4">
                                         <label>Nama Lengkap</label>
-                                        <input type="text" class="form-control" placeholder="Masukkan Nama Tutor"
+                                        <input type="text" class="form-control" placeholder="Masukkan Nama Guru"
                                             v-model="form.name">
                                         <div v-if="errors.name" class="alert alert-danger mt-2">
                                             {{ errors.name }}
@@ -40,7 +40,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-4">
                                         <label>Email</label>
-                                        <input type="email" class="form-control" placeholder="Masukkan Email Tutor"
+                                        <input type="email" class="form-control" placeholder="Masukkan Email Guru"
                                             v-model="form.email">
                                         <div v-if="errors.email" class="alert alert-danger mt-2">
                                             {{ errors.email }}

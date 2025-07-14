@@ -1,4 +1,5 @@
 <template>
+
     <Head>
         <title>Siswa - Aplikasi Ujian Online</title>
     </Head>
@@ -6,23 +7,33 @@
         <div class="row">
             <div class="col-md-8">
                 <div class="row">
+                    <div class="col-md-2 col-12 mb-2">
+                        <Link href="/admin/students/create" class="btn btn-md btn-primary border-0 shadow w-100"
+                            type="button">
+                        <i class="fa fa-plus-circle"></i>
+                        Tambah
+                        </Link>
+
+                    </div>
                     <div class="col-md-3 col-12 mb-2">
-                        <Link href="/admin/students/create" class="btn btn-md btn-primary border-0 shadow w-100" type="button">
-                            <i class="fa fa-plus-circle"></i>
-                            Tambah
+                        <Link href="/admin/students/import" class="btn btn-md btn-success border-0 shadow w-100"
+                            type="button">
+                        <i class="fa fa-file text-white"></i>
+                        import
                         </Link>
                     </div>
-                    <div class="col-md-5 col-12 mb-2">
+                    <div class="col-md-4 col-12 mb-2">
                         <form @submit.prevent="handleSearch">
                             <div class="input-group">
-                                <input type="text" class="form-control border-0 shadow" v-model="search" placeholder="masukkan kata kunci dan enter...">
+                                <input type="text" class="form-control border-0 shadow" v-model="search"
+                                    placeholder="masukkan kata kunci dan enter...">
                                 <span class="input-group-text border-0 shadow">
                                     <i class="fa fa-search"></i>
                                 </span>
                             </div>
                         </form>
                     </div>
-                    <div class="col-md-4 col-12 mb-2">
+                    <div class="col-md-3 col-12 mb-2">
                         <select class="form-select border-0 shadow" v-model="selectedClassroom" @change="handleFilter">
                             <option value="">Semua Kelas</option>
                             <option v-for="classroom in classrooms" :key="classroom.id" :value="classroom.id">
@@ -52,16 +63,19 @@
                                 <div class="mt-2"></div>
                                 <tbody>
                                     <tr v-for="(student, index) in students.data" :key="index">
-                                        <td class="fw-bold text-center">{{ ++index + (students.current_page - 1) * students.per_page }}</td>
+                                        <td class="fw-bold text-center">{{ ++index + (students.current_page - 1) *
+                                            students.per_page }}</td>
                                         <td>{{ student.nisn }}</td>
                                         <td>{{ student.name }}</td>
                                         <td>{{ student.email }}</td>
                                         <td>{{ student.classroom ? student.classroom.title : '-' }}</td>
                                         <td class="text-center">
-                                            <Link :href="`/admin/students/${student.id}/edit`" class="btn btn-sm btn-info border-0 shadow me-2" type="button">
-                                                <i class="fa fa-pencil-alt"></i>
+                                            <Link :href="`/admin/students/${student.id}/edit`"
+                                                class="btn btn-sm btn-info border-0 shadow me-2" type="button">
+                                            <i class="fa fa-pencil-alt"></i>
                                             </Link>
-                                            <button @click.prevent="destroy(student.id)" class="btn btn-sm btn-danger border-0">
+                                            <button @click.prevent="destroy(student.id)"
+                                                class="btn btn-sm btn-danger border-0">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
@@ -78,83 +92,83 @@
 </template>
 
 <script>
-    //import layout
-    import LayoutAdmin from '../../../Layouts/Admin.vue';
+//import layout
+import LayoutAdmin from '../../../Layouts/Admin.vue';
 
-    //import component pagination
-    import Pagination from '../../../Components/Pagination.vue';
+//import component pagination
+import Pagination from '../../../Components/Pagination.vue';
 
-    //import Head and Link from Inertia
-    import {
+//import Head and Link from Inertia
+import {
+    Head,
+    Link
+} from '@inertiajs/inertia-vue3';
+
+//import ref from vue
+import {
+    ref
+} from 'vue';
+
+//import inertia adapter
+import { Inertia } from '@inertiajs/inertia';
+
+//import sweet alert2
+import Swal from 'sweetalert2';
+
+export default {
+    //layout
+    layout: LayoutAdmin,
+
+    //register component
+    components: {
         Head,
-        Link
-    } from '@inertiajs/inertia-vue3';
+        Link,
+        Pagination
+    },
 
-    //import ref from vue
-    import {
-        ref
-    } from 'vue';
+    //props
+    props: {
+        students: Object,
+        classrooms: Array,
+        filters: Object,
+    },
 
-    //import inertia adapter
-    import { Inertia } from '@inertiajs/inertia';
+    //inisialisasi composition API
+    setup(props) {
 
-    //import sweet alert2
-    import Swal from 'sweetalert2';
+        //define state search
+        const search = ref(props.filters.q || '');
 
-    export default {
-        //layout
-        layout: LayoutAdmin,
+        //define state for selected classroom
+        const selectedClassroom = ref(props.filters.classroom_id || '');
 
-        //register component
-        components: {
-            Head,
-            Link,
-            Pagination
-        },
+        //define method search
+        const handleSearch = () => {
+            Inertia.get('/admin/students', {
+                q: search.value,
+                classroom_id: selectedClassroom.value,
+            });
+        }
 
-        //props
-        props: {
-            students: Object,
-            classrooms: Array,
-            filters: Object,
-        },
+        //define method filter
+        const handleFilter = () => {
+            Inertia.get('/admin/students', {
+                q: search.value,
+                classroom_id: selectedClassroom.value,
+            });
+        }
 
-        //inisialisasi composition API
-        setup(props) {
-
-            //define state search
-            const search = ref(props.filters.q || '');
-            
-            //define state for selected classroom
-            const selectedClassroom = ref(props.filters.classroom_id || '');
-
-            //define method search
-            const handleSearch = () => {
-                Inertia.get('/admin/students', {
-                    q: search.value,
-                    classroom_id: selectedClassroom.value,
-                });
-            }
-
-            //define method filter
-            const handleFilter = () => {
-                Inertia.get('/admin/students', {
-                    q: search.value,
-                    classroom_id: selectedClassroom.value,
-                });
-            }
-
-            //define method destroy
-            const destroy = (id) => {
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Anda tidak akan dapat mengembalikan ini!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                })
+        //define method destroy
+        const destroy = (id) => {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak akan dapat mengembalikan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            })
                 .then((result) => {
                     if (result.isConfirmed) {
 
@@ -169,22 +183,20 @@
                         });
                     }
                 })
-            }
-
-            //return
-            return {
-                search,
-                selectedClassroom,
-                handleSearch,
-                handleFilter,
-                destroy,
-            }
-
         }
+
+        //return
+        return {
+            search,
+            selectedClassroom,
+            handleSearch,
+            handleFilter,
+            destroy,
+        }
+
     }
+}
 
 </script>
 
-<style>
-
-</style>
+<style></style>
