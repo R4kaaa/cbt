@@ -114,23 +114,38 @@
 
                         <!-- Essay Answer Section -->
                         <div v-else-if="question_active.question.question_type === 'essay'" class="essay-answer mt-4">
-                            <div class="form-group">
-                                <label for="essay-answer" class="form-label fw-bold mb-2">
-                                    <i class="fa fa-pen me-2"></i>Jawaban Essay:
-                                </label>
-                                <textarea id="essay-answer" v-model="essayAnswer" class="form-control" rows="10" placeholder="Ketik jawaban essay Anda di sini..." style="font-size: 16px;"></textarea>
+    <div class="form-group">
+        <label for="essay-answer" class="form-label fw-bold mb-2">
+            <i class="fa fa-pen me-2"></i>Jawaban Essay:
+        </label>
+        
+        <!-- Ganti textarea dengan TinyMCE Editor -->
+        <Editor
+            :api-key="'dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o'"
+            v-model="essayAnswer"
+            :init="tinymceConfig"
+            @input="handleTinyMCEInput"
+        />
 
-                                <div class="character-count text-end text-muted mt-2">
-                                    <small>{{ essayAnswer.length }} karakter</small>
-                                </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="character-count text-muted">
+                <small>{{ essayAnswer.length }} karakter</small>
+            </div>
+            <div class="romaji-indicator">
+                <small class="text-info">
+                    <i class="fa fa-language me-1"></i>
+                    Romaji otomatis dikonversi ke Hiragana
+                </small>
+            </div>
+        </div>
 
-                                <div class="d-flex justify-content-end mt-4">
-                                    <button @click.prevent="submitEssayAnswer(question_active.question.exam.id, question_active.question.id)" class="btn btn-primary px-4">
-                                        <i class="fa fa-save me-2"></i> Simpan Jawaban
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+        <div class="d-flex justify-content-end mt-4">
+            <button @click.prevent="submitEssayAnswer(question_active.question.exam.id, question_active.question.id)" class="btn btn-primary px-4">
+                <i class="fa fa-save me-2"></i> Simpan Jawaban
+            </button>
+        </div>
+    </div>
+</div>
                     </div>
 
                     <div v-else class="alert alert-danger border-0 shadow text-center">
@@ -277,7 +292,7 @@
 <script>
 //import layout student
 import LayoutStudent from '../../../Layouts/Student.vue';
-
+import Editor from '@tinymce/tinymce-vue';
 //import Head and Link from Inertia
 import {
     Head,
@@ -314,7 +329,8 @@ export default {
     components: {
         Head,
         Link,
-        VueCountdown
+        VueCountdown,
+        Editor
     },
 
     //props
@@ -333,6 +349,119 @@ export default {
     setup(props) {
         //define options for answer
         let options = ["A", "B", "C", "D", "E"];
+        const romajiToHiragana = {
+            'a': 'あ', 'i': 'い', 'u': 'う', 'e': 'え', 'o': 'お',
+            'ka': 'か', 'ki': 'き', 'ku': 'く', 'ke': 'け', 'ko': 'こ',
+            'ga': 'が', 'gi': 'ぎ', 'gu': 'ぐ', 'ge': 'げ', 'go': 'ご',
+            'sa': 'さ', 'shi': 'し', 'su': 'す', 'se': 'せ', 'so': 'そ',
+            'za': 'ざ', 'ji': 'じ', 'zu': 'ず', 'ze': 'ぜ', 'zo': 'ぞ',
+            'ta': 'た', 'chi': 'ち', 'tsu': 'つ', 'te': 'て', 'to': 'と',
+            'da': 'だ', 'di': 'ぢ', 'du': 'づ', 'de': 'で', 'do': 'ど',
+            'na': 'な', 'ni': 'に', 'nu': 'ぬ', 'ne': 'ね', 'no': 'の',
+            'ha': 'は', 'hi': 'ひ', 'fu': 'ふ', 'he': 'へ', 'ho': 'ほ',
+            'ba': 'ば', 'bi': 'び', 'bu': 'ぶ', 'be': 'べ', 'bo': 'ぼ',
+            'pa': 'ぱ', 'pi': 'ぴ', 'pu': 'ぷ', 'pe': 'ぺ', 'po': 'ぽ',
+            'ma': 'ま', 'mi': 'み', 'mu': 'む', 'me': 'め', 'mo': 'も',
+            'ya': 'や', 'yu': 'ゆ', 'yo': 'よ',
+            'ra': 'ら', 'ri': 'り', 'ru': 'る', 're': 'れ', 'ro': 'ろ',
+            'wa': 'わ', 'wi': 'ゐ', 'we': 'ゑ', 'wo': 'を', 'n': 'ん',
+            'kya': 'きゃ', 'kyu': 'きゅ', 'kyo': 'きょ',
+            'gya': 'ぎゃ', 'gyu': 'ぎゅ', 'gyo': 'ぎょ',
+            'sha': 'しゃ', 'shu': 'しゅ', 'sho': 'しょ',
+            'ja': 'じゃ', 'ju': 'じゅ', 'jo': 'じょ',
+            'cha': 'ちゃ', 'chu': 'ちゅ', 'cho': 'ちょ',
+            'nya': 'にゃ', 'nyu': 'にゅ', 'nyo': 'にょ',
+            'hya': 'ひゃ', 'hyu': 'ひゅ', 'hyo': 'ひょ',
+            'bya': 'びゃ', 'byu': 'びゅ', 'byo': 'びょ',
+            'pya': 'ぴゃ', 'pyu': 'ぴゅ', 'pyo': 'ぴょ',
+            'mya': 'みゃ', 'myu': 'みゅ', 'myo': 'みょ',
+            'rya': 'りゃ', 'ryu': 'りゅ', 'ryo': 'りょ',
+            'si': 'し', 'ti': 'ち', 'tu': 'つ', 'zi': 'じ',
+            'nn': 'ん', 'xya': 'ゃ', 'xyu': 'ゅ', 'xyo': 'ょ',
+            'xa': 'ぁ', 'xi': 'ぃ', 'xu': 'ぅ', 'xe': 'ぇ', 'xo': 'ぉ',
+            'xtu': 'っ', 'xtsu': 'っ', 'ltu': 'っ', 'ltsu': 'っ',
+            'xwa': 'ゎ', 'xke': 'ゖ', 'xka': 'ゕ'
+        };
+
+        // Fungsi konversi yang diperbaiki
+        const convertToHiragana = (text) => {
+            let result = '';
+            let i = 0;
+            
+            while (i < text.length) {
+                let matched = false;
+                
+                // Cek dari yang paling panjang ke yang paling pendek
+                for (let len = 4; len >= 1; len--) {
+                    if (i + len <= text.length) {
+                        const substr = text.substring(i, i + len).toLowerCase();
+                        if (romajiToHiragana[substr]) {
+                            result += romajiToHiragana[substr];
+                            i += len;
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!matched) {
+                    result += text[i];
+                    i++;
+                }
+            }
+            
+            return result;
+        };
+
+        // Handler untuk TinyMCE dengan konversi otomatis
+        const handleTinyMCEInput = (content, editor) => {
+            // Dapatkan posisi cursor
+            const bookmark = editor.selection.getBookmark();
+            
+            // Konversi content
+            const convertedContent = convertToHiragana(content);
+            
+            // Update content jika ada perubahan
+            if (convertedContent !== content) {
+                essayAnswer.value = convertedContent;
+                editor.setContent(convertedContent);
+                
+                // Restore posisi cursor
+                setTimeout(() => {
+                    editor.selection.moveToBookmark(bookmark);
+                }, 10);
+            } else {
+                essayAnswer.value = content;
+            }
+        };
+
+        // Konfigurasi TinyMCE
+        const tinymceConfig = {
+            height: 300,
+            menubar: false,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'preview', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }',
+            setup: (editor) => {
+                // Setup event listener untuk konversi real-time
+                editor.on('input', (e) => {
+                    const content = editor.getContent({ format: 'text' });
+                    handleTinyMCEInput(content, editor);
+                });
+                
+                // Handle paste event
+                editor.on('paste', (e) => {
+                    setTimeout(() => {
+                        const content = editor.getContent({ format: 'text' });
+                        handleTinyMCEInput(content, editor);
+                    }, 10);
+                });
+            }
+        };
 
         //define state counter
         const counter = ref(0);
@@ -651,7 +780,11 @@ export default {
             // Helper methods for UI
             getQuestionTypeLabel,
             getQuestionTypeBadgeClass,
-            getQuestionTypeButtonClass
+            getQuestionTypeButtonClass,
+            // TinyMCE methods
+            handleTinyMCEInput,
+            tinymceConfig,
+            convertToHiragana
         }
     }
 }

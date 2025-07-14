@@ -217,7 +217,7 @@
                                             <br>
                                             <small class="text-success">
                                                 <strong>Jawaban yang benar:</strong> {{ getOptionText(answer.question,
-                                                answer.question.answer) }}
+                                                    answer.question.answer) }}
                                             </small>
                                         </div>
                                     </div>
@@ -245,7 +245,7 @@
                                                 <strong>Jawaban yang dipilih:</strong>
                                                 <span v-if="answer.selected_answers_decoded.length > 0">
                                                     {{answer.selected_answers_decoded.map(opt =>
-                                                    getOptionText(answer.question, opt)).join(', ') }}
+                                                        getOptionText(answer.question, opt)).join(', ')}}
                                                 </span>
                                                 <span v-else class="text-muted">Tidak ada pilihan</span>
                                             </small>
@@ -253,7 +253,7 @@
                                             <small class="text-success">
                                                 <strong>Jawaban yang benar:</strong>
                                                 {{answer.correct_answers.map(opt => getOptionText(answer.question,
-                                                opt)).join(', ') }}
+                                                    opt)).join(', ')}}
                                             </small>
                                         </div>
                                     </div>
@@ -262,21 +262,21 @@
                                         <h6 class="fw-bold mb-2">Jawaban Siswa:</h6>
                                         <div class="card bg-light border-0 mb-3">
                                             <div class="card-body">
-                                                <p class="mb-0">{{ answer.essay_answer || 'Tidak ada jawaban' }}</p>
+                                                <p class="mb-0">{{ cleanEssayAnswer(answer.essay_answer) }}</p>
                                             </div>
                                         </div>
 
                                         <h6 class="fw-bold mb-2">Jawaban yang Diharapkan:</h6>
                                         <div class="card bg-success bg-opacity-10 border-success border-opacity-25">
                                             <div class="card-body">
-                                                <p class="mb-0">{{ answer.question.essay_answer }}</p>
+                                                <p class="mb-0">{{ cleanHtmlTags(answer.question.essay_answer) }}</p>
                                             </div>
                                         </div>
 
                                         <div v-if="answer.similarity_score" class="mt-2">
                                             <small class="text-muted">
                                                 <strong>Tingkat Kemiripan:</strong> {{
-                                                Math.round(answer.similarity_score * 100) }}%
+                                                    Math.round(answer.similarity_score * 100) }}%
                                             </small>
                                         </div>
                                     </div>
@@ -356,7 +356,10 @@ export default {
             };
             return badges[type] || 'bg-secondary';
         },
-
+        cleanEssayAnswer(answer) {
+            if (!answer) return 'Tidak ada jawaban';
+            return this.cleanHtmlTags(answer);
+        },
         getQuestionTypeLabel(type) {
             const labels = {
                 'single': 'Pilihan Tunggal',
@@ -405,9 +408,16 @@ export default {
 
         getOptionText(question, optionNumber) {
             const optionKey = `option_${optionNumber}`;
-            return question[optionKey] || '';
+            const rawText = question[optionKey] || '';
+            // Bersihkan HTML tags
+            return this.cleanHtmlTags(rawText);
         },
+        cleanHtmlTags(htmlString) {
+            if (!htmlString) return '';
+            // Menghilangkan semua HTML tags
+            return htmlString.replace(/<\/?p[^>]*>/g, '');
 
+        },
         getOptionClass(answer, optionNumber) {
             const isSelected = answer.answer == optionNumber;
             const isCorrect = answer.question.answer == optionNumber;
