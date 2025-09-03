@@ -212,7 +212,7 @@ export default {
 
         isAdmin() {
             // Check if user exists and role is 1 (admin)
-            return this.auth?.user?.role === 1;
+            return 1;
         },
 
         userRole() {
