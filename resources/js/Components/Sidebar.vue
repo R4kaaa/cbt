@@ -212,7 +212,7 @@ export default {
 
         isAdmin() {
             // Check if user exists and role is 1 (admin)
-            return 1;
+            return true;
         },
 
         userRole() {
