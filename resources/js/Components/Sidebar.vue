@@ -217,7 +217,7 @@ export default {
 
         userRole() {
             // Return role based on user role value
-            if (!this.auth?.user) return 'GUEST';
+            if (!this.auth?.user) return 'ADMIN';
             return this.auth.user.role === 1 ? 'ADMIN' : 'TUTOR';
         }
     },
