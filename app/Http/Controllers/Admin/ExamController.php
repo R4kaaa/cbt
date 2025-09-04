@@ -127,11 +127,6 @@ class ExamController extends Controller
     {
         $validatedData = $request->validate([
             'question'          => 'required',
-            'option_1'          => 'nullable|required_if:question_type,single,multiple',
-            'option_2'          => 'nullable|required_if:question_type,single,multiple',
-            'option_3'          => 'nullable|required_if:question_type,single,multiple',
-            'option_4'          => 'nullable|required_if:question_type,single,multiple',
-            'option_5'          => 'nullable|required_if:question_type,single,multiple',
             'question_type'     => 'required|in:single,multiple,essay',
         ]);
 
