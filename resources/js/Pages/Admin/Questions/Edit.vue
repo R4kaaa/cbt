@@ -1,12 +1,13 @@
-
 <template>
+
     <Head>
         <title>Edit Soal Ujian - Aplikasi Ujian Online</title>
     </Head>
     <div class="container-fluid mb-5 mt-5">
         <div class="row">
             <div class="col-md-12">
-                <Link :href="`/admin/exams/${exam.id}`" class="btn btn-md btn-primary border-0 shadow mb-3" type="button"><i class="fa fa-long-arrow-alt-left me-2"></i> Kembali</Link>
+                <Link :href="`/admin/exams/${exam.id}`" class="btn btn-md btn-primary border-0 shadow mb-3"
+                    type="button"><i class="fa fa-long-arrow-alt-left me-2"></i> Kembali</Link>
                 <div class="card border-0 shadow">
                     <div class="card-body">
                         <h5><i class="fa fa-question-circle"></i> Edit Soal Ujian</h5>
@@ -16,19 +17,22 @@
                                 <label class="form-label fw-bold">Tipe Soal</label>
                                 <div class="d-flex">
                                     <div class="form-check me-4">
-                                        <input class="form-check-input" type="radio" v-model="form.question_type" value="single" id="single">
+                                        <input class="form-check-input" type="radio" v-model="form.question_type"
+                                            value="single" id="single">
                                         <label class="form-check-label" for="single">
                                             Jawaban Tunggal
                                         </label>
                                     </div>
                                     <div class="form-check me-4">
-                                        <input class="form-check-input" type="radio" v-model="form.question_type" value="multiple" id="multiple">
+                                        <input class="form-check-input" type="radio" v-model="form.question_type"
+                                            value="multiple" id="multiple">
                                         <label class="form-check-label" for="multiple">
                                             Jawaban Ganda
                                         </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" v-model="form.question_type" value="essay" id="essay">
+                                        <input class="form-check-input" type="radio" v-model="form.question_type"
+                                            value="essay" id="essay">
                                         <label class="form-check-label" for="essay">
                                             Essay
                                         </label>
@@ -43,19 +47,22 @@
                                 <label class="form-label fw-bold">Tipe Media</label>
                                 <div class="d-flex">
                                     <div class="form-check me-4">
-                                        <input class="form-check-input" type="radio" v-model="form.media_type" value="none" id="none">
+                                        <input class="form-check-input" type="radio" v-model="form.media_type"
+                                            value="none" id="none">
                                         <label class="form-check-label" for="none">
                                             Tanpa Media
                                         </label>
                                     </div>
                                     <div class="form-check me-4">
-                                        <input class="form-check-input" type="radio" v-model="form.media_type" value="image" id="image">
+                                        <input class="form-check-input" type="radio" v-model="form.media_type"
+                                            value="image" id="image">
                                         <label class="form-check-label" for="image">
                                             Gambar
                                         </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" v-model="form.media_type" value="audio" id="audio">
+                                        <input class="form-check-input" type="radio" v-model="form.media_type"
+                                            value="audio" id="audio">
                                         <label class="form-check-label" for="audio">
                                             Audio (Listening)
                                         </label>
@@ -78,7 +85,8 @@
                                 </div>
                                 <div v-else-if="currentImage" class="mt-3">
                                     <p class="mb-2">Gambar saat ini:</p>
-                                    <img :src="'/storage/questions/' + currentImage" class="img-fluid" style="max-height: 200px;" />
+                                    <img :src="'/storage/questions/' + currentImage" class="img-fluid"
+                                        style="max-height: 200px;" />
                                 </div>
                             </div>
 
@@ -104,35 +112,30 @@
                                         <tr>
                                             <td style="width:20%" class="fw-bold">Soal</td>
                                             <td>
-                                                <Editor 
-                                                    api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                    v-model="form.question" 
-                                                    :init="{
+                                                <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                    v-model="form.question" :init="{
                                                         menubar: false,
                                                         plugins: 'lists link image emoticons',
                                                         toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }"
-                                                />
+                                                    }" />
                                                 <div v-if="errors.question" class="mt-2 text-danger">
                                                     {{ errors.question }}
                                                 </div>
                                             </td>
                                         </tr>
                                         <!-- Options shown only for single and multiple choice questions -->
-                                        <template v-if="form.question_type === 'single' || form.question_type === 'multiple'">
+                                        <template
+                                            v-if="form.question_type === 'single' || form.question_type === 'multiple'">
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan A</td>
                                                 <td>
-                                                    <Editor 
-                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                        v-model="form.option_1" 
-                                                        :init="{
+                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                        v-model="form.option_1" :init="{
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
                                                             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }"
-                                                    />
+                                                        }" />
                                                     <div v-if="errors.option_1" class="mt-2 text-danger">
                                                         {{ errors.option_1 }}
                                                     </div>
@@ -141,16 +144,13 @@
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan B</td>
                                                 <td>
-                                                    <Editor 
-                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                        v-model="form.option_2" 
-                                                        :init="{
+                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                        v-model="form.option_2" :init="{
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
                                                             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }"
-                                                    />
+                                                        }" />
                                                     <div v-if="errors.option_2" class="mt-2 text-danger">
                                                         {{ errors.option_2 }}
                                                     </div>
@@ -159,16 +159,13 @@
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan C</td>
                                                 <td>
-                                                    <Editor 
-                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                        v-model="form.option_3" 
-                                                        :init="{
+                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                        v-model="form.option_3" :init="{
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
                                                             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }"
-                                                    />
+                                                        }" />
                                                     <div v-if="errors.option_3" class="mt-2 text-danger">
                                                         {{ errors.option_3 }}
                                                     </div>
@@ -177,16 +174,13 @@
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan D</td>
                                                 <td>
-                                                    <Editor 
-                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                        v-model="form.option_4" 
-                                                        :init="{
+                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                        v-model="form.option_4" :init="{
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
                                                             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }"
-                                                    />
+                                                        }" />
                                                     <div v-if="errors.option_4" class="mt-2 text-danger">
                                                         {{ errors.option_4 }}
                                                     </div>
@@ -195,16 +189,13 @@
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan E</td>
                                                 <td>
-                                                    <Editor 
-                                                        api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                        v-model="form.option_5" 
-                                                        :init="{
+                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                        v-model="form.option_5" :init="{
                                                             height: 130,
                                                             menubar: false,
                                                             plugins: 'lists link image emoticons',
                                                             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }"
-                                                    />
+                                                        }" />
                                                     <div v-if="errors.option_5" class="mt-2 text-danger">
                                                         {{ errors.option_5 }}
                                                     </div>
@@ -229,31 +220,36 @@
                                                 <td style="width:20%" class="fw-bold">Jawaban Benar</td>
                                                 <td>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="1" id="answer1">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            v-model="form.answers" value="1" id="answer1">
                                                         <label class="form-check-label" for="answer1">
                                                             A
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="2" id="answer2">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            v-model="form.answers" value="2" id="answer2">
                                                         <label class="form-check-label" for="answer2">
                                                             B
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="3" id="answer3">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            v-model="form.answers" value="3" id="answer3">
                                                         <label class="form-check-label" for="answer3">
                                                             C
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="4" id="answer4">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            v-model="form.answers" value="4" id="answer4">
                                                         <label class="form-check-label" for="answer4">
                                                             D
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" v-model="form.answers" value="5" id="answer5">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            v-model="form.answers" value="5" id="answer5">
                                                         <label class="form-check-label" for="answer5">
                                                             E
                                                         </label>
@@ -268,26 +264,24 @@
                                         <tr v-if="form.question_type === 'essay'">
                                             <td style="width:20%" class="fw-bold">Kunci Jawaban Essay</td>
                                             <td>
-                                                <Editor 
-                                                    api-key="dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o" 
-                                                    v-model="form.essay_answer" 
-                                                    :init="{
+                                                <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                    v-model="form.essay_answer" :init="{
                                                         height: 200,
                                                         menubar: false,
                                                         plugins: 'lists link image emoticons',
                                                         toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }"
-                                                />
+                                                    }" />
                                                 <div v-if="errors.essay_answer" class="mt-2 text-danger">
                                                     {{ errors.essay_answer }}
                                                 </div>
-                                                <small class="text-muted mt-2">Masukkan kunci jawaban atau panduan penilaian untuk soal essay.</small>
+                                                <small class="text-muted mt-2">Masukkan kunci jawaban atau panduan
+                                                    penilaian untuk soal essay.</small>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                             <button type="submit" class="btn btn-md btn-primary border-0 shadow me-2">Simpan</button>
                             <button type="reset" class="btn btn-md btn-warning border-0 shadow">Reset</button>
                         </form>
@@ -299,175 +293,174 @@
 </template>
 
 <script>
-    //import layout
-    import LayoutAdmin from '../../../Layouts/Admin.vue';
+//import layout
+import LayoutAdmin from '../../../Layouts/Admin.vue';
 
-    //import Heade and Link from Inertia
-    import {
+//import Heade and Link from Inertia
+import {
+    Head,
+    Link
+} from '@inertiajs/inertia-vue3';
+
+//import reactive from vue
+import { reactive, ref } from 'vue';
+
+//import inerita adapter
+import { Inertia } from '@inertiajs/inertia';
+
+//import sweet alert2
+import Swal from 'sweetalert2';
+
+//import tinyMCE
+import Editor from '@tinymce/tinymce-vue';
+
+export default {
+
+    //layout
+    layout: LayoutAdmin,
+
+    //register components
+    components: {
         Head,
-        Link
-    } from '@inertiajs/inertia-vue3';
+        Link,
+        Editor,
+    },
 
-    //import reactive from vue
-    import { reactive, ref } from 'vue';
+    //props
+    props: {
+        errors: Object,
+        exam: Object,
+        question: Object,
+    },
 
-    //import inerita adapter
-    import { Inertia } from '@inertiajs/inertia';
+    //inisialisasi composition API
+    setup(props) {
+        // Store current media for preview
+        const currentImage = ref(props.question.question_image);
+        const currentAudio = ref(props.question.audio_file);
 
-    //import sweet alert2
-    import Swal from 'sweetalert2';
+        // For image and audio preview of newly selected files
+        const imagePreview = ref(null);
+        const audioPreview = ref(null);
 
-    //import tinyMCE
-    import Editor from '@tinymce/tinymce-vue';
+        //define form with reactive
+        const form = reactive({
+            question: props.question.question,
+            option_1: props.question.option_1,
+            option_2: props.question.option_2,
+            option_3: props.question.option_3,
+            option_4: props.question.option_4,
+            option_5: props.question.option_5,
+            question_type: props.question.question_type || 'single',
+            media_type: props.question.media_type || 'none',
+            answer: props.question.answer,
+            answers: Array.isArray(props.question.answers)
+                ? props.question.answers
+                : (props.question.answers ? props.question.answers.split(',') : []),
+            essay_answer: props.question.essay_answer || '', // Add essay_answer field
+            question_image: null, // File object for new image upload
+            audio_file: null, // File object for new audio upload
+        });
 
-    export default {
-
-        //layout
-        layout: LayoutAdmin,
-
-        //register components
-        components: {
-            Head,
-            Link,
-            Editor,
-        },
-
-        //props
-        props: {
-            errors: Object,
-            exam: Object,
-            question: Object,
-        },
-
-        //inisialisasi composition API
-        setup(props) {
-            // Store current media for preview
-            const currentImage = ref(props.question.question_image);
-            const currentAudio = ref(props.question.audio_file);
-            
-            // For image and audio preview of newly selected files
-            const imagePreview = ref(null);
-            const audioPreview = ref(null);
-
-            //define form with reactive
-            const form = reactive({
-                question: props.question.question,
-                option_1: props.question.option_1,
-                option_2: props.question.option_2,
-                option_3: props.question.option_3,
-                option_4: props.question.option_4,
-                option_5: props.question.option_5,
-                question_type: props.question.question_type || 'single',
-                media_type: props.question.media_type || 'none',
-                answer: props.question.answer,
-                answers: Array.isArray(props.question.answers) 
-                    ? props.question.answers 
-                    : (props.question.answers ? props.question.answers.split(',') : []),
-                essay_answer: props.question.essay_answer || '', // Add essay_answer field
-                question_image: null, // File object for new image upload
-                audio_file: null, // File object for new audio upload
-            });
-
-            // Handle image upload
-            const handleImageUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Store file object in form data
-                    form.question_image = file;
-                    // Create preview URL
-                    imagePreview.value = URL.createObjectURL(file);
-                    // Reset audio file if an image is selected
-                    form.audio_file = null;
-                    audioPreview.value = null;
-                }
-            };
-
-            // Handle audio upload
-            const handleAudioUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Store file object in form data
-                    form.audio_file = file;
-                    // Create preview URL
-                    audioPreview.value = URL.createObjectURL(file);
-                    // Reset image file if audio is selected
-                    form.question_image = null;
-                    imagePreview.value = null;
-                }
-            };
-
-            // Method "submit" using FormData for file uploads
-            const submit = () => {
-                // Create FormData object
-                const formData = new FormData();
-                
-                // Append basic form fields
-                formData.append('question', form.question);
-                formData.append('question_type', form.question_type);
-                formData.append('media_type', form.media_type);
-                
-                // Add fields based on question type
-                if (form.question_type === 'single' || form.question_type === 'multiple') {
-                    formData.append('option_1', form.option_1);
-                    formData.append('option_2', form.option_2);
-                    formData.append('option_3', form.option_3);
-                    formData.append('option_4', form.option_4);
-                    formData.append('option_5', form.option_5);
-                }
-                
-                // Add answer based on question type
-                if (form.question_type === 'single') {
-                    formData.append('answer', form.answer);
-                } else if (form.question_type === 'multiple') {
-                    // Convert array to JSON string for multiple answers
-                    form.answers.forEach(answer => {
-                        formData.append('answers[]', answer);
-                    });
-                } else if (form.question_type === 'essay') {
-                    formData.append('essay_answer', form.essay_answer);
-                }
-                
-                // Add files if they exist
-                if (form.media_type === 'image' && form.question_image) {
-                    formData.append('question_image', form.question_image);
-                }
-                
-                if (form.media_type === 'audio' && form.audio_file) {
-                    formData.append('audio_file', form.audio_file);
-                }
-                
-                // Send data to server using POST method
-                Inertia.post(`/admin/exams/${props.exam.id}/questions/${props.question.id}/update`, formData, {
-                    forceFormData: true,
-                    preserveScroll: true,
-                    preserveState: false,
-                    onSuccess: () => {
-                        // Show success alert
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Soal Ujian Berhasil Diupdate!',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    },
-                });
-            };
-
-            //return
-            return {
-                form,
-                currentImage,
-                currentAudio,
-                imagePreview,
-                audioPreview,
-                handleImageUpload,
-                handleAudioUpload,
-                submit,
+        // Handle image upload
+        const handleImageUpload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // Store file object in form data
+                form.question_image = file;
+                // Create preview URL
+                imagePreview.value = URL.createObjectURL(file);
+                // Reset audio file if an image is selected
+                form.audio_file = null;
+                audioPreview.value = null;
             }
+        };
+
+        // Handle audio upload
+        const handleAudioUpload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // Store file object in form data
+                form.audio_file = file;
+                // Create preview URL
+                audioPreview.value = URL.createObjectURL(file);
+                // Reset image file if audio is selected
+                form.question_image = null;
+                imagePreview.value = null;
+            }
+        };
+
+        // Method "submit" using FormData for file uploads
+        const submit = () => {
+            // Create FormData object
+            const formData = new FormData();
+
+            // Append basic form fields
+            formData.append('question', form.question);
+            formData.append('question_type', form.question_type);
+            formData.append('media_type', form.media_type);
+
+            // Add fields based on question type
+            if (form.question_type === 'single' || form.question_type === 'multiple') {
+                formData.append('option_1', form.option_1);
+                formData.append('option_2', form.option_2);
+                formData.append('option_3', form.option_3);
+                formData.append('option_4', form.option_4);
+                formData.append('option_5', form.option_5);
+            }
+
+            // Add answer based on question type
+            if (form.question_type === 'single') {
+                formData.append('answer', form.answer);
+            } else if (form.question_type === 'multiple') {
+                // Convert array to JSON string for multiple answers
+                form.answers.forEach(answer => {
+                    formData.append('answers[]', answer);
+                });
+            } else if (form.question_type === 'essay') {
+                formData.append('essay_answer', form.essay_answer);
+            }
+
+            // Add files if they exist
+            if (form.media_type === 'image' && form.question_image) {
+                formData.append('question_image', form.question_image);
+            }
+
+            if (form.media_type === 'audio' && form.audio_file) {
+                formData.append('audio_file', form.audio_file);
+            }
+
+            // Send data to server using POST method
+            Inertia.post(`/admin/exams/${props.exam.id}/questions/${props.question.id}/update`, formData, {
+                forceFormData: true,
+                preserveScroll: true,
+                preserveState: false,
+                onSuccess: () => {
+                    // Show success alert
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Soal Ujian Berhasil Diupdate!',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+            });
+        };
+
+        //return
+        return {
+            form,
+            currentImage,
+            currentAudio,
+            imagePreview,
+            audioPreview,
+            handleImageUpload,
+            handleAudioUpload,
+            submit,
         }
     }
+}
 </script>
 
-<style>
-</style>
+<style></style>

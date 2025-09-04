@@ -1,292 +1,320 @@
 <template>
-<Head>
-    <title>Ujian: Soal No. {{ page }} - Aplikasi Ujian Online</title>
-</Head>
-<div class="container-fluid pb-5">
-    <div class="row mb-4">
-        <!-- Question Panel -->
-        <div class="col-md-8 mb-4 mb-md-0">
-            <div class="card border-0 shadow">
-                <!-- Question Header -->
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Soal No. <strong class="fw-bold">{{ page }}</strong> dari {{ all_questions.length }}</h5>
-                        <div>
-                            <VueCountdown :time="duration" @progress="handleChangeDuration" @end="showModalEndTimeExam = true" v-slot="{ hours, minutes, seconds }">
-                                <span class="badge bg-info p-2 fs-6">
-                                    <i class="fa fa-clock me-1"></i> {{ hours }} jam, {{ minutes }} menit, {{ seconds }} detik
-                                </span>
-                            </VueCountdown>
+
+    <Head>
+        <title>Ujian: Soal No. {{ page }} - Aplikasi Ujian Online</title>
+    </Head>
+    <div class="container-fluid pb-5">
+        <div class="row mb-4">
+            <!-- Question Panel -->
+            <div class="col-md-8 mb-4 mb-md-0">
+                <div class="card border-0 shadow">
+                    <!-- Question Header -->
+                    <div class="card-header bg-white py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Soal No. <strong class="fw-bold">{{ page }}</strong> dari {{
+                                all_questions.length }}</h5>
+                            <div>
+                                <VueCountdown :time="duration" @progress="handleChangeDuration"
+                                    @end="showModalEndTimeExam = true" v-slot="{ hours, minutes, seconds }">
+                                    <span class="badge bg-info p-2 fs-6">
+                                        <i class="fa fa-clock me-1"></i> {{ hours }} jam, {{ minutes }} menit, {{
+                                        seconds }} detik
+                                    </span>
+                                </VueCountdown>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Question Content -->
-                <div class="card-body" style="min-height: 400px;">
-                    <div v-if="question_active !== null">
-                        <!-- Question Type Badge -->
-                        <div class="mb-2">
-                            <span class="badge" :class="getQuestionTypeBadgeClass(question_active.question.question_type)">
-                                {{ getQuestionTypeLabel(question_active.question.question_type) }}
-                            </span>
+                    <!-- Question Content -->
+                    <div class="card-body" style="min-height: 400px;">
+                        <div v-if="question_active !== null">
+                            <!-- Question Type Badge -->
+                            <div class="mb-2">
+                                <span class="badge"
+                                    :class="getQuestionTypeBadgeClass(question_active.question.question_type)">
+                                    {{ getQuestionTypeLabel(question_active.question.question_type) }}
+                                </span>
 
-                            <!-- Added Media Type Badge -->
-                            <span v-if="question_active.question.media_type !== 'none'" class="badge bg-secondary ms-2">
-                                {{ question_active.question.media_type === 'image' ? 'Dengan Gambar' : 'Dengan Audio' }}
-                            </span>
-                        </div>
-
-                        <!-- Question Text -->
-                        <div class="question-text mb-4 pb-2 border-bottom">
-                            <!-- Question Media: Images and Audio Display -->
-                            <div v-if="question_active.question.media_type !== 'none'" class="question-media mb-3">
-                                <!-- Image Display -->
-                                <img v-if="question_active.question.media_type === 'image' && question_active.question.question_image" :src="`/storage/questions/${question_active.question.question_image}`" class="img-fluid rounded mb-3 border shadow-sm" alt="Question Image" style="max-height: 300px;" />
-
-                                <!-- Audio Display -->
-                                <div v-if="question_active.question.media_type === 'audio' && question_active.question.audio_file" class="audio-player border rounded p-3 bg-light mb-3">
-                                    <p class="mb-2"><i class="fa fa-music me-2"></i> File Audio Soal:</p>
-                                    <audio controls class="w-100">
-                                        <source :src="`/storage/questions/${question_active.question.audio_file}`" type="audio/mpeg">
-                                        Browser Anda tidak mendukung pemutaran audio.
-                                    </audio>
-                                </div>
+                                <!-- Added Media Type Badge -->
+                                <span v-if="question_active.question.media_type !== 'none'"
+                                    class="badge bg-secondary ms-2">
+                                    {{ question_active.question.media_type === 'image' ? 'Dengan Gambar' : 'Dengan
+                                    Audio' }}
+                                </span>
                             </div>
 
                             <!-- Question Text -->
-                            <p v-html="question_active.question.question" class="fs-5"></p>
+                            <div class="question-text mb-4 pb-2 border-bottom">
+                                <!-- Question Media: Images and Audio Display -->
+                                <div v-if="question_active.question.media_type !== 'none'" class="question-media mb-3">
+                                    <!-- Image Display -->
+                                    <img v-if="question_active.question.media_type === 'image' && question_active.question.question_image"
+                                        :src="`/storage/questions/${question_active.question.question_image}`"
+                                        class="img-fluid rounded mb-3 border shadow-sm" alt="Question Image"
+                                        style="max-height: 300px;" />
 
-                            <!-- Help text for multiple choice -->
-                            <div v-if="question_active.question.question_type === 'multiple'" class="alert alert-info">
-                                <i class="fa fa-info-circle me-2"></i> Pilih semua jawaban yang benar
-                            </div>
-
-                            <!-- Help text for essay -->
-                            <div v-if="question_active.question.question_type === 'essay'" class="alert alert-warning">
-                                <i class="fa fa-pencil-alt me-2"></i> Ketik jawaban essay Anda pada kotak di bawah
-                            </div>
-                        </div>
-
-                        <!-- Answer Options for Single Choice -->
-                        <div v-if="question_active.question.question_type === 'single'" class="answer-options">
-                            <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
-                                <div class="d-flex">
-                                    <div class="option-label me-3">
-                                        <button :class="[
-                                    'btn btn-lg fw-bold', 
-                                    answer == question_active.answer ? 'btn-info' : 'btn-outline-info'
-                                ]" @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
-                                            {{ options[index] }}
-                                        </button>
-                                    </div>
-                                    <div class="option-content flex-grow-1" :class="{ 'selected': answer == question_active.answer }" @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
-                                        <p v-html="question_active.question['option_'+answer]" class="mb-0"></p>
+                                    <!-- Audio Display -->
+                                    <div v-if="question_active.question.media_type === 'audio' && question_active.question.audio_file"
+                                        class="audio-player border rounded p-3 bg-light mb-3">
+                                        <p class="mb-2"><i class="fa fa-music me-2"></i> File Audio Soal:</p>
+                                        <audio controls class="w-100">
+                                            <source :src="`/storage/questions/${question_active.question.audio_file}`"
+                                                type="audio/mpeg">
+                                            Browser Anda tidak mendukung pemutaran audio.
+                                        </audio>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- Answer Options for Multiple Choice -->
-                        <div v-else-if="question_active.question.question_type === 'multiple'" class="answer-options">
-                            <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
-                                <div class="d-flex">
-                                    <div class="option-label me-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" :id="'option-'+answer" :checked="isAnswerSelected(answer)" @change="toggleMultipleAnswer(answer)" style="width: 25px; height: 25px; cursor: pointer;">
-                                            <label class="form-check-label" :for="'option-'+answer">
-                                                <span class="ms-2 fs-5 fw-bold">{{ options[index] }}</span>
-                                            </label>
+                                <!-- Question Text -->
+                                <p v-html="question_active.question.question" class="fs-5"></p>
+
+                                <!-- Help text for multiple choice -->
+                                <div v-if="question_active.question.question_type === 'multiple'"
+                                    class="alert alert-info">
+                                    <i class="fa fa-info-circle me-2"></i> Pilih semua jawaban yang benar
+                                </div>
+
+                                <!-- Help text for essay -->
+                                <div v-if="question_active.question.question_type === 'essay'"
+                                    class="alert alert-warning">
+                                    <i class="fa fa-pencil-alt me-2"></i> Ketik jawaban essay Anda pada kotak di bawah
+                                </div>
+                            </div>
+
+                            <!-- Answer Options for Single Choice -->
+                            <div v-if="question_active.question.question_type === 'single'" class="answer-options">
+                                <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
+                                    <div class="d-flex">
+                                        <div class="option-label me-3">
+                                            <button :class="[
+                                                'btn btn-lg fw-bold',
+                                                answer == question_active.answer ? 'btn-info' : 'btn-outline-info'
+                                            ]" @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
+                                                {{ options[index] }}
+                                            </button>
+                                        </div>
+                                        <div class="option-content flex-grow-1"
+                                            :class="{ 'selected': answer == question_active.answer }"
+                                            @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
+                                            <p v-html="question_active.question['option_' + answer]" class="mb-0"></p>
                                         </div>
                                     </div>
-                                    <div class="option-content flex-grow-1" :class="{ 'selected': isAnswerSelected(answer) }" @click.prevent="toggleMultipleAnswer(answer)">
-                                        <p v-html="question_active.question['option_'+answer]" class="mb-0"></p>
-                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Save Button for Multiple Choice -->
-                            <div class="d-flex justify-content-end mt-4">
-                                <button @click.prevent="submitMultipleAnswers(question_active.question.exam.id, question_active.question.id)" class="btn btn-primary px-4">
-                                    <i class="fa fa-save me-2"></i> Simpan Jawaban
+                            <!-- Answer Options for Multiple Choice -->
+                            <div v-else-if="question_active.question.question_type === 'multiple'"
+                                class="answer-options">
+                                <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
+                                    <div class="d-flex">
+                                        <div class="option-label me-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" :id="'option-' + answer"
+                                                    :checked="isAnswerSelected(answer)"
+                                                    @change="toggleMultipleAnswer(answer)"
+                                                    style="width: 25px; height: 25px; cursor: pointer;">
+                                                <label class="form-check-label" :for="'option-' + answer">
+                                                    <span class="ms-2 fs-5 fw-bold">{{ options[index] }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="option-content flex-grow-1"
+                                            :class="{ 'selected': isAnswerSelected(answer) }"
+                                            @click.prevent="toggleMultipleAnswer(answer)">
+                                            <p v-html="question_active.question['option_' + answer]" class="mb-0"></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Save Button for Multiple Choice -->
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button
+                                        @click.prevent="submitMultipleAnswers(question_active.question.exam.id, question_active.question.id)"
+                                        class="btn btn-primary px-4">
+                                        <i class="fa fa-save me-2"></i> Simpan Jawaban
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Essay Answer Section -->
+                            <div v-else-if="question_active.question.question_type === 'essay'"
+                                class="essay-answer mt-4">
+                                <div class="form-group">
+                                    <label for="essay-answer" class="form-label fw-bold mb-2">
+                                        <i class="fa fa-pen me-2"></i>Jawaban Essay:
+                                    </label>
+
+                                    <!-- Ganti textarea dengan TinyMCE Editor -->
+                                    <Editor :api-key="'f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr'"
+                                        v-model="essayAnswer" :init="tinymceConfig" @input="handleTinyMCEInput" />
+
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <div class="character-count text-muted">
+                                            <small>{{ essayAnswer.length }} karakter</small>
+                                        </div>
+                                        <div class="romaji-indicator">
+                                            <small class="text-info">
+                                                <i class="fa fa-language me-1"></i>
+                                                Romaji otomatis dikonversi ke Hiragana
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end mt-4">
+                                        <button
+                                            @click.prevent="submitEssayAnswer(question_active.question.exam.id, question_active.question.id)"
+                                            class="btn btn-primary px-4">
+                                            <i class="fa fa-save me-2"></i> Simpan Jawaban
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-else class="alert alert-danger border-0 shadow text-center">
+                            <i class="fa fa-exclamation-triangle me-2"></i> Soal Tidak Ditemukan!
+                        </div>
+                    </div>
+
+                    <!-- Navigation Footer -->
+                    <div class="card-footer bg-white py-3">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button v-if="page > 1" @click.prevent="prevPage" class="btn btn-secondary px-4">
+                                    <i class="fa fa-arrow-left me-2"></i> Sebelumnya
+                                </button>
+                            </div>
+                            <div>
+                                <button v-if="page < all_questions.length" @click.prevent="nextPage"
+                                    class="btn btn-secondary px-4">
+                                    Selanjutnya <i class="fa fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Essay Answer Section -->
-                        <div v-else-if="question_active.question.question_type === 'essay'" class="essay-answer mt-4">
-    <div class="form-group">
-        <label for="essay-answer" class="form-label fw-bold mb-2">
-            <i class="fa fa-pen me-2"></i>Jawaban Essay:
-        </label>
-        
-        <!-- Ganti textarea dengan TinyMCE Editor -->
-        <Editor
-            :api-key="'dwq3i99zdbda10alithjifi49cxh7qnk222xfozi26pdxv3o'"
-            v-model="essayAnswer"
-            :init="tinymceConfig"
-            @input="handleTinyMCEInput"
-        />
-
-        <div class="d-flex justify-content-between align-items-center mt-2">
-            <div class="character-count text-muted">
-                <small>{{ essayAnswer.length }} karakter</small>
+                    </div>
+                </div>
             </div>
-            <div class="romaji-indicator">
-                <small class="text-info">
-                    <i class="fa fa-language me-1"></i>
-                    Romaji otomatis dikonversi ke Hiragana
-                </small>
-            </div>
-        </div>
 
-        <div class="d-flex justify-content-end mt-4">
-            <button @click.prevent="submitEssayAnswer(question_active.question.exam.id, question_active.question.id)" class="btn btn-primary px-4">
-                <i class="fa fa-save me-2"></i> Simpan Jawaban
-            </button>
+            <!-- Navigation Panel -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow mb-4">
+                    <div class="card-header bg-white py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Navigasi Soal</h5>
+                            <div class="badge bg-success p-2">
+                                <i class="fa fa-check-circle me-1"></i> {{ question_answered }} dari {{
+                                all_questions.length }} Dikerjakan
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body question-nav" style="height: 320px; overflow-y: auto;">
+                        <div class="row g-2">
+                            <div v-for="(question, index) in all_questions" :key="index" class="col-2">
+                                <button @click.prevent="clickQuestion(index)" :class="[
+                                    'btn btn-sm w-100 question-button',
+                                    index + 1 == page ? 'btn-dark' :
+                                        questionIsAnswered(question) ? getQuestionTypeButtonClass(question.question.question_type) : 'btn-outline-info'
+                                ]" :title="getQuestionTypeLabel(question.question.question_type)">
+                                    {{ index + 1 }}
+                                    <span v-if="question.question.question_type === 'essay'" class="small">
+                                        <i class="fa fa-pen-alt"></i>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white py-3">
+                        <button @click="showModalEndExam = true" class="btn btn-danger btn-lg w-100 border-0 shadow">
+                            <i class="fa fa-flag-checkered me-2"></i> Akhiri Ujian
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Exam Information -->
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i> Informasi Ujian</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>Materi:</span>
+                                <span class="fw-bold">{{ exam_group.exam.lesson.title }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>Total Soal:</span>
+                                <span class="fw-bold">{{ all_questions.length }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>Sudah Dijawab:</span>
+                                <span class="fw-bold">{{ question_answered }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>Belum Dijawab:</span>
+                                <span class="fw-bold">{{ all_questions.length - question_answered }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-                    </div>
 
-                    <div v-else class="alert alert-danger border-0 shadow text-center">
-                        <i class="fa fa-exclamation-triangle me-2"></i> Soal Tidak Ditemukan!
-                    </div>
+    <!-- Modal Confirm End Exam -->
+    <div v-if="showModalEndExam" class="modal fade show" tabindex="-1" aria-hidden="true"
+        style="display:block; z-index:1050;" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fa fa-exclamation-triangle me-2"></i> Konfirmasi Akhiri Ujian</h5>
                 </div>
+                <div class="modal-body py-4">
+                    <p class="fs-5 mb-0">Setelah mengakhiri ujian, Anda tidak dapat kembali ke ujian ini lagi.</p>
 
-                <!-- Navigation Footer -->
-                <div class="card-footer bg-white py-3">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <button v-if="page > 1" @click.prevent="prevPage" class="btn btn-secondary px-4">
-                                <i class="fa fa-arrow-left me-2"></i> Sebelumnya
-                            </button>
-                        </div>
-                        <div>
-                            <button v-if="page < all_questions.length" @click.prevent="nextPage" class="btn btn-secondary px-4">
-                                Selanjutnya <i class="fa fa-arrow-right ms-2"></i>
-                            </button>
-                        </div>
+                    <div v-if="all_questions.length - question_answered > 0" class="alert alert-warning mt-3">
+                        <i class="fa fa-exclamation-circle me-2"></i> Masih ada <strong>{{ all_questions.length -
+                            question_answered }}</strong> soal yang belum Anda jawab.
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Navigation Panel -->
-        <div class="col-md-4">
-            <div class="card border-0 shadow mb-4">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Navigasi Soal</h5>
-                        <div class="badge bg-success p-2">
-                            <i class="fa fa-check-circle me-1"></i> {{ question_answered }} dari {{ all_questions.length }} Dikerjakan
-                        </div>
-                    </div>
+                    <p class="fw-bold mt-3 mb-0">Yakin akan mengakhiri ujian?</p>
                 </div>
-
-                <div class="card-body question-nav" style="height: 320px; overflow-y: auto;">
-                    <div class="row g-2">
-                        <div v-for="(question, index) in all_questions" :key="index" class="col-2">
-                            <button @click.prevent="clickQuestion(index)" :class="[
-                                    'btn btn-sm w-100 question-button', 
-                                    index+1 == page ? 'btn-dark' : 
-                                    questionIsAnswered(question) ? getQuestionTypeButtonClass(question.question.question_type) : 'btn-outline-info'
-                                ]" :title="getQuestionTypeLabel(question.question.question_type)">
-                                {{ index + 1 }}
-                                <span v-if="question.question.question_type === 'essay'" class="small">
-                                    <i class="fa fa-pen-alt"></i>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-footer bg-white py-3">
-                    <button @click="showModalEndExam = true" class="btn btn-danger btn-lg w-100 border-0 shadow">
-                        <i class="fa fa-flag-checkered me-2"></i> Akhiri Ujian
+                <div class="modal-footer">
+                    <button @click.prevent="endExam" type="button" class="btn btn-danger px-4">
+                        <i class="fa fa-check me-2"></i> Ya, Akhiri Ujian
+                    </button>
+                    <button @click.prevent="showModalEndExam = false" type="button" class="btn btn-secondary px-4">
+                        <i class="fa fa-times me-2"></i> Kembali ke Ujian
                     </button>
                 </div>
             </div>
+        </div>
+        <div class="modal-backdrop fade show" style="z-index:1040;"></div>
+    </div>
 
-            <!-- Exam Information -->
-            <div class="card border-0 shadow">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i> Informasi Ujian</h5>
+    <!-- Modal Time's Up -->
+    <div v-if="showModalEndTimeExam" class="modal fade show" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-hidden="true" style="display:block; z-index:1050;" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title"><i class="fa fa-clock me-2"></i> Waktu Habis!</h5>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Materi:</span>
-                            <span class="fw-bold">{{ exam_group.exam.lesson.title }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Total Soal:</span>
-                            <span class="fw-bold">{{ all_questions.length }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Sudah Dijawab:</span>
-                            <span class="fw-bold">{{ question_answered }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Belum Dijawab:</span>
-                            <span class="fw-bold">{{ all_questions.length - question_answered }}</span>
-                        </li>
-                    </ul>
+                <div class="modal-body py-4 text-center">
+                    <i class="fa fa-stopwatch fa-4x mb-3 text-warning"></i>
+                    <p class="fs-5">Waktu ujian sudah berakhir!</p>
+                    <p>Klik <strong class="fw-bold">Selesai</strong> untuk mengakhiri ujian.</p>
+                </div>
+                <div class="modal-footer">
+                    <button @click.prevent="endExam" type="button" class="btn btn-primary w-100">
+                        <i class="fa fa-check-circle me-2"></i> Selesai
+                    </button>
                 </div>
             </div>
         </div>
+        <div class="modal-backdrop fade show" style="z-index:1040;"></div>
     </div>
-</div>
-
-<!-- Modal Confirm End Exam -->
-<div v-if="showModalEndExam" class="modal fade show" tabindex="-1" aria-hidden="true" style="display:block; z-index:1050;" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title"><i class="fa fa-exclamation-triangle me-2"></i> Konfirmasi Akhiri Ujian</h5>
-            </div>
-            <div class="modal-body py-4">
-                <p class="fs-5 mb-0">Setelah mengakhiri ujian, Anda tidak dapat kembali ke ujian ini lagi.</p>
-
-                <div v-if="all_questions.length - question_answered > 0" class="alert alert-warning mt-3">
-                    <i class="fa fa-exclamation-circle me-2"></i> Masih ada <strong>{{ all_questions.length - question_answered }}</strong> soal yang belum Anda jawab.
-                </div>
-
-                <p class="fw-bold mt-3 mb-0">Yakin akan mengakhiri ujian?</p>
-            </div>
-            <div class="modal-footer">
-                <button @click.prevent="endExam" type="button" class="btn btn-danger px-4">
-                    <i class="fa fa-check me-2"></i> Ya, Akhiri Ujian
-                </button>
-                <button @click.prevent="showModalEndExam = false" type="button" class="btn btn-secondary px-4">
-                    <i class="fa fa-times me-2"></i> Kembali ke Ujian
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show" style="z-index:1040;"></div>
-</div>
-
-<!-- Modal Time's Up -->
-<div v-if="showModalEndTimeExam" class="modal fade show" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" style="display:block; z-index:1050;" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title"><i class="fa fa-clock me-2"></i> Waktu Habis!</h5>
-            </div>
-            <div class="modal-body py-4 text-center">
-                <i class="fa fa-stopwatch fa-4x mb-3 text-warning"></i>
-                <p class="fs-5">Waktu ujian sudah berakhir!</p>
-                <p>Klik <strong class="fw-bold">Selesai</strong> untuk mengakhiri ujian.</p>
-            </div>
-            <div class="modal-footer">
-                <button @click.prevent="endExam" type="button" class="btn btn-primary w-100">
-                    <i class="fa fa-check-circle me-2"></i> Selesai
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show" style="z-index:1040;"></div>
-</div>
 </template>
 
 <script>
@@ -387,10 +415,10 @@ export default {
         const convertToHiragana = (text) => {
             let result = '';
             let i = 0;
-            
+
             while (i < text.length) {
                 let matched = false;
-                
+
                 // Cek dari yang paling panjang ke yang paling pendek
                 for (let len = 4; len >= 1; len--) {
                     if (i + len <= text.length) {
@@ -403,13 +431,13 @@ export default {
                         }
                     }
                 }
-                
+
                 if (!matched) {
                     result += text[i];
                     i++;
                 }
             }
-            
+
             return result;
         };
 
@@ -417,15 +445,15 @@ export default {
         const handleTinyMCEInput = (content, editor) => {
             // Dapatkan posisi cursor
             const bookmark = editor.selection.getBookmark();
-            
+
             // Konversi content
             const convertedContent = convertToHiragana(content);
-            
+
             // Update content jika ada perubahan
             if (convertedContent !== content) {
                 essayAnswer.value = convertedContent;
                 editor.setContent(convertedContent);
-                
+
                 // Restore posisi cursor
                 setTimeout(() => {
                     editor.selection.moveToBookmark(bookmark);
@@ -452,7 +480,7 @@ export default {
                     const content = editor.getContent({ format: 'text' });
                     handleTinyMCEInput(content, editor);
                 });
-                
+
                 // Handle paste event
                 editor.on('paste', (e) => {
                     setTimeout(() => {
