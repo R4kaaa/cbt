@@ -141,8 +141,8 @@ class ExamController extends Controller
         if ($request->media_type === 'image') {
             if ($request->hasFile('question_image')) {
                 // Delete old image if exists
-                if ($question->question_image && Storage::exists('public/questions/' . $question->question_image)) {
-                    Storage::delete('public/questions/' . $question->question_image);
+                if ($question->question_image && Storage::disk('public_html')->exists('questions/' . $question->question_image)) {
+                    Storage::disk('public_html')->delete('questions/' . $question->question_image);
                 }
 
                 // Generate unique filename
@@ -152,14 +152,15 @@ class ExamController extends Controller
                 $extension = $image->getClientOriginalExtension();
                 $questionImage = "{$examTitle}_{$timestamp}.{$extension}";
 
-                $image->storeAs('public/questions', $questionImage);
+                // Save directly to public_html/storage/questions
+                $image->storeAs('questions', $questionImage, 'public_html');
             }
             $audioFile = null;
         } else if ($request->media_type === 'audio') {
             if ($request->hasFile('audio_file')) {
                 // Delete old audio if exists
-                if ($question->audio_file && Storage::exists('public/questions/' . $question->audio_file)) {
-                    Storage::delete('public/questions/' . $question->audio_file);
+                if ($question->audio_file && Storage::disk('public_html')->exists('questions/' . $question->audio_file)) {
+                    Storage::disk('public_html')->delete('questions/' . $question->audio_file);
                 }
 
                 // Generate unique filename
@@ -169,21 +170,23 @@ class ExamController extends Controller
                 $extension = $audio->getClientOriginalExtension();
                 $audioFile = "{$examTitle}_{$timestamp}.{$extension}";
 
-                $audio->storeAs('public/questions', $audioFile);
+                // Save directly to public_html/storage/questions
+                $audio->storeAs('questions', $audioFile, 'public_html');
             }
             $questionImage = null;
         } else if ($request->media_type === 'none') {
             // Delete existing media files if switching to no media
-            if ($question->question_image && Storage::exists('public/questions/' . $question->question_image)) {
-                Storage::delete('public/questions/' . $question->question_image);
+            if ($question->question_image && Storage::disk('public_html')->exists('questions/' . $question->question_image)) {
+                Storage::disk('public_html')->delete('questions/' . $question->question_image);
             }
-            if ($question->audio_file && Storage::exists('public/questions/' . $question->audio_file)) {
-                Storage::delete('public/questions/' . $question->audio_file);
+            if ($question->audio_file && Storage::disk('public_html')->exists('questions/' . $question->audio_file)) {
+                Storage::disk('public_html')->delete('questions/' . $question->audio_file);
             }
 
             $questionImage = null;
             $audioFile = null;
         }
+
 
         if ($request->question_type === 'single') {
             $question->update([
@@ -250,6 +253,7 @@ class ExamController extends Controller
         $audioFile = null;
 
         // Handle image upload
+        // Handle image upload
         if ($request->hasFile('question_image') && $request->media_type === 'image') {
             $image = $request->file('question_image');
             $examTitle = str_replace(' ', '_', strtolower($exam->title));
@@ -257,7 +261,8 @@ class ExamController extends Controller
             $extension = $image->getClientOriginalExtension();
             $questionImage = "{$examTitle}_{$timestamp}.{$extension}";
 
-            $image->storeAs('public/questions', $questionImage);
+            // Save directly to public_html/storage/questions
+            $image->storeAs('questions', $questionImage, 'public_html');
         }
 
         // Handle audio upload
@@ -268,8 +273,10 @@ class ExamController extends Controller
             $extension = $audio->getClientOriginalExtension();
             $audioFile = "{$examTitle}_{$timestamp}.{$extension}";
 
-            $audio->storeAs('public/questions', $audioFile);
+            // Save directly to public_html/storage/questions
+            $audio->storeAs('questions', $audioFile, 'public_html');
         }
+
 
         if ($request->question_type === 'single') {
             Question::create([
