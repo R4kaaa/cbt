@@ -47,7 +47,7 @@ class LessonController extends Controller
     {
         $request->validate([
             'title' => 'required|string|unique:lessons,title,' . $lesson->id,
-            'kkm' => 'required|integer|min:0|max:100',
+            'kkm' => 'required|integer|min:0',
         ]);
 
         $lesson->update([
