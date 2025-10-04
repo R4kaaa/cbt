@@ -534,28 +534,28 @@
     "file": "assets/main.4ea4cf43.css",
     "src": "main.css"
   },
-  "resources/js/Pages/Student/Exams/Confirmation.css": {
-    "file": "assets/Confirmation.b18ff215.css",
-    "src": "resources/js/Pages/Student/Exams/Confirmation.css"
-  },
   "resources/js/Pages/Student/Exams/History.css": {
     "file": "assets/History.fdfba1bd.css",
     "src": "resources/js/Pages/Student/Exams/History.css"
+  },
+  "resources/js/Pages/Student/Exams/Confirmation.css": {
+    "file": "assets/Confirmation.b18ff215.css",
+    "src": "resources/js/Pages/Student/Exams/Confirmation.css"
   },
   "resources/js/Pages/Student/Dashboard/Index.css": {
     "file": "assets/Index.b57732dc.css",
     "src": "resources/js/Pages/Student/Dashboard/Index.css"
   },
-  "resources/js/Pages/Student/Exams/Show.css": {
-    "file": "assets/Show.1d4bb94d.css",
-    "src": "resources/js/Pages/Student/Exams/Show.css"
+  "resources/js/Pages/Student/Exams/Result.css": {
+    "file": "assets/Result.01b940a2.css",
+    "src": "resources/js/Pages/Student/Exams/Result.css"
   },
   "resources/js/Pages/Student/Exams/HistoryDetail.css": {
     "file": "assets/HistoryDetail.5bcf7ede.css",
     "src": "resources/js/Pages/Student/Exams/HistoryDetail.css"
   },
-  "resources/js/Pages/Student/Exams/Result.css": {
-    "file": "assets/Result.01b940a2.css",
-    "src": "resources/js/Pages/Student/Exams/Result.css"
+  "resources/js/Pages/Student/Exams/Show.css": {
+    "file": "assets/Show.1d4bb94d.css",
+    "src": "resources/js/Pages/Student/Exams/Show.css"
   }
 }
