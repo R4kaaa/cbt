@@ -31,7 +31,7 @@ class DashboardController extends Controller
         //count classrooms
         $classrooms = Classroom::count();
 
-        return inertia('Admin/Dashboard/index', [
+        return inertia('Admin/Dashboard/Index', [
             'students'      => $students,
             'exams'         => $exams,
             'exam_sessions' => $exam_sessions,
