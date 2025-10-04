@@ -27,7 +27,7 @@
                             <div class="mb-4">
                                 <label>Skor KKM</label>
                                 <input type="number" class="form-control" placeholder="Masukkan Skor KKM"
-                                    v-model="form.kkm" min="0" max="100">
+                                    v-model="form.kkm" min="0">
 
                                 <div v-if="errors.kkm" class="alert alert-danger mt-2">
                                     {{ errors.kkm }}
