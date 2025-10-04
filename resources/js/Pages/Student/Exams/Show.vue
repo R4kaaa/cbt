@@ -33,8 +33,7 @@
 
                                 <span v-if="question_active.question.media_type !== 'none'"
                                     class="badge bg-secondary ms-2">
-                                    {{ question_active.question.media_type === 'image' ? 'Dengan Gambar' : 'Dengan
-                                    Audio' }}
+                                    {{ question_active.question.media_type === 'image' ? 'Dengan Gambar' : 'DenganAudio' }}
                                 </span>
                             </div>
 
