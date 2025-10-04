@@ -5,10 +5,8 @@
     </Head>
     <div class="container-fluid pb-5">
         <div class="row mb-4">
-            <!-- Question Panel -->
             <div class="col-md-8 mb-4 mb-md-0">
                 <div class="card border-0 shadow">
-                    <!-- Question Header -->
                     <div class="card-header bg-white py-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Soal No. <strong class="fw-bold">{{ page }}</strong> dari {{
@@ -18,24 +16,21 @@
                                     @end="showModalEndTimeExam = true" v-slot="{ hours, minutes, seconds }">
                                     <span class="badge bg-info p-2 fs-6">
                                         <i class="fa fa-clock me-1"></i> {{ hours }} jam, {{ minutes }} menit, {{
-                                        seconds }} detik
+                                            seconds }} detik
                                     </span>
                                 </VueCountdown>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Question Content -->
                     <div class="card-body" style="min-height: 400px;">
                         <div v-if="question_active !== null">
-                            <!-- Question Type Badge -->
                             <div class="mb-2">
                                 <span class="badge"
                                     :class="getQuestionTypeBadgeClass(question_active.question.question_type)">
                                     {{ getQuestionTypeLabel(question_active.question.question_type) }}
                                 </span>
 
-                                <!-- Added Media Type Badge -->
                                 <span v-if="question_active.question.media_type !== 'none'"
                                     class="badge bg-secondary ms-2">
                                     {{ question_active.question.media_type === 'image' ? 'Dengan Gambar' : 'Dengan
@@ -43,17 +38,13 @@
                                 </span>
                             </div>
 
-                            <!-- Question Text -->
                             <div class="question-text mb-4 pb-2 border-bottom">
-                                <!-- Question Media: Images and Audio Display -->
                                 <div v-if="question_active.question.media_type !== 'none'" class="question-media mb-3">
-                                    <!-- Image Display -->
                                     <img v-if="question_active.question.media_type === 'image' && question_active.question.question_image"
                                         :src="`/storage/questions/${question_active.question.question_image}`"
                                         class="img-fluid rounded mb-3 border shadow-sm" alt="Question Image"
                                         style="max-height: 300px;" />
 
-                                    <!-- Audio Display -->
                                     <div v-if="question_active.question.media_type === 'audio' && question_active.question.audio_file"
                                         class="audio-player border rounded p-3 bg-light mb-3">
                                         <p class="mb-2"><i class="fa fa-music me-2"></i> File Audio Soal:</p>
@@ -65,23 +56,19 @@
                                     </div>
                                 </div>
 
-                                <!-- Question Text -->
                                 <p v-html="question_active.question.question" class="fs-5"></p>
 
-                                <!-- Help text for multiple choice -->
                                 <div v-if="question_active.question.question_type === 'multiple'"
                                     class="alert alert-info">
                                     <i class="fa fa-info-circle me-2"></i> Pilih semua jawaban yang benar
                                 </div>
 
-                                <!-- Help text for essay -->
                                 <div v-if="question_active.question.question_type === 'essay'"
                                     class="alert alert-warning">
                                     <i class="fa fa-pencil-alt me-2"></i> Ketik jawaban essay Anda pada kotak di bawah
                                 </div>
                             </div>
 
-                            <!-- Answer Options for Single Choice -->
                             <div v-if="question_active.question.question_type === 'single'" class="answer-options">
                                 <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
                                     <div class="d-flex">
@@ -89,20 +76,25 @@
                                             <button :class="[
                                                 'btn btn-lg fw-bold',
                                                 answer == question_active.answer ? 'btn-info' : 'btn-outline-info'
-                                            ]" @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
+                                            ]"
+                                                @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
                                                 {{ options[index] }}
                                             </button>
                                         </div>
                                         <div class="option-content flex-grow-1"
                                             :class="{ 'selected': answer == question_active.answer }"
                                             @click.prevent="answer != question_active.answer && submitAnswer(question_active.question.exam.id, question_active.question.id, answer)">
-                                            <p v-html="question_active.question['option_' + answer]" class="mb-0"></p>
+                                            <img v-if="question_active.question.option_type === 'image' && question_active.question['option_' + answer]"
+                                                :src="`/storage/questions/options/${question_active.question['option_' + answer]}`"
+                                                class="img-fluid rounded border" :alt="'Opsi ' + options[index]"
+                                                style="max-height: 200px; cursor: pointer;" />
+                                            <p v-else v-html="question_active.question['option_' + answer]"
+                                                class="mb-0"></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Answer Options for Multiple Choice -->
                             <div v-else-if="question_active.question.question_type === 'multiple'"
                                 class="answer-options">
                                 <div v-for="(answer, index) in answer_order" :key="index" class="answer-option mb-3">
@@ -121,12 +113,16 @@
                                         <div class="option-content flex-grow-1"
                                             :class="{ 'selected': isAnswerSelected(answer) }"
                                             @click.prevent="toggleMultipleAnswer(answer)">
-                                            <p v-html="question_active.question['option_' + answer]" class="mb-0"></p>
+                                            <img v-if="question_active.question.option_type === 'image' && question_active.question['option_' + answer]"
+                                                :src="`/storage/questions/options/${question_active.question['option_' + answer]}`"
+                                                class="img-fluid rounded border" :alt="'Opsi ' + options[index]"
+                                                style="max-height: 200px; cursor: pointer;" />
+                                            <p v-else v-html="question_active.question['option_' + answer]"
+                                                class="mb-0"></p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Save Button for Multiple Choice -->
                                 <div class="d-flex justify-content-end mt-4">
                                     <button
                                         @click.prevent="submitMultipleAnswers(question_active.question.exam.id, question_active.question.id)"
@@ -136,7 +132,6 @@
                                 </div>
                             </div>
 
-                            <!-- Essay Answer Section -->
                             <div v-else-if="question_active.question.question_type === 'essay'"
                                 class="essay-answer mt-4">
                                 <div class="form-group">
@@ -144,19 +139,12 @@
                                         <i class="fa fa-pen me-2"></i>Jawaban Essay:
                                     </label>
 
-                                    <!-- Ganti textarea dengan TinyMCE Editor -->
                                     <Editor :api-key="'f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr'"
-                                        v-model="essayAnswer" :init="tinymceConfig" @input="handleTinyMCEInput" />
+                                        v-model="essayAnswer" :init="tinymceConfig" />
 
-                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="d-flex justify-content-end mt-2">
                                         <div class="character-count text-muted">
                                             <small>{{ essayAnswer.length }} karakter</small>
-                                        </div>
-                                        <div class="romaji-indicator">
-                                            <small class="text-info">
-                                                <i class="fa fa-language me-1"></i>
-                                                Romaji otomatis dikonversi ke Hiragana
-                                            </small>
                                         </div>
                                     </div>
 
@@ -176,7 +164,6 @@
                         </div>
                     </div>
 
-                    <!-- Navigation Footer -->
                     <div class="card-footer bg-white py-3">
                         <div class="d-flex justify-content-between">
                             <div>
@@ -195,7 +182,6 @@
                 </div>
             </div>
 
-            <!-- Navigation Panel -->
             <div class="col-md-4">
                 <div class="card border-0 shadow mb-4">
                     <div class="card-header bg-white py-3">
@@ -203,7 +189,7 @@
                             <h5 class="mb-0">Navigasi Soal</h5>
                             <div class="badge bg-success p-2">
                                 <i class="fa fa-check-circle me-1"></i> {{ question_answered }} dari {{
-                                all_questions.length }} Dikerjakan
+                                    all_questions.length }} Dikerjakan
                             </div>
                         </div>
                     </div>
@@ -232,7 +218,6 @@
                     </div>
                 </div>
 
-                <!-- Exam Information -->
                 <div class="card border-0 shadow">
                     <div class="card-header bg-white py-3">
                         <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i> Informasi Ujian</h5>
@@ -262,7 +247,6 @@
         </div>
     </div>
 
-    <!-- Modal Confirm End Exam -->
     <div v-if="showModalEndExam" class="modal fade show" tabindex="-1" aria-hidden="true"
         style="display:block; z-index:1050;" role="dialog">
         <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
@@ -293,7 +277,6 @@
         <div class="modal-backdrop fade show" style="z-index:1040;"></div>
     </div>
 
-    <!-- Modal Time's Up -->
     <div v-if="showModalEndTimeExam" class="modal fade show" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-hidden="true" style="display:block; z-index:1050;" role="dialog">
         <div class="modal-dialog modal-dialog-centered" style="z-index:1055;">
@@ -318,50 +301,23 @@
 </template>
 
 <script>
-//import layout student
 import LayoutStudent from '../../../Layouts/Student.vue';
 import Editor from '@tinymce/tinymce-vue';
-//import Head and Link from Inertia
-import {
-    Head,
-    Link
-} from '@inertiajs/inertia-vue3';
-
-//import ref
-import {
-    ref,
-    computed,
-    onMounted,
-    watch
-} from 'vue';
-
-//import VueCountdown
+import { Head, Link } from '@inertiajs/inertia-vue3';
+import { ref, onMounted, watch } from 'vue';
 import VueCountdown from '@chenfengyuan/vue-countdown';
-
-//import axios
 import axios from 'axios';
-
-//import inertia adapter
-import {
-    Inertia
-} from '@inertiajs/inertia';
-
-//import sweet alert2
+import { Inertia } from '@inertiajs/inertia';
 import Swal from 'sweetalert2';
 
 export default {
-    //layout
     layout: LayoutStudent,
-
-    //register components
     components: {
         Head,
         Link,
         VueCountdown,
         Editor
     },
-
-    //props
     props: {
         id: Number,
         page: Number,
@@ -372,98 +328,9 @@ export default {
         answer_order: Array,
         duration: Object,
     },
-
-    //composition API
     setup(props) {
-        //define options for answer
         let options = ["A", "B", "C", "D", "E"];
-        const romajiToHiragana = {
-            'a': 'あ', 'i': 'い', 'u': 'う', 'e': 'え', 'o': 'お',
-            'ka': 'か', 'ki': 'き', 'ku': 'く', 'ke': 'け', 'ko': 'こ',
-            'ga': 'が', 'gi': 'ぎ', 'gu': 'ぐ', 'ge': 'げ', 'go': 'ご',
-            'sa': 'さ', 'shi': 'し', 'su': 'す', 'se': 'せ', 'so': 'そ',
-            'za': 'ざ', 'ji': 'じ', 'zu': 'ず', 'ze': 'ぜ', 'zo': 'ぞ',
-            'ta': 'た', 'chi': 'ち', 'tsu': 'つ', 'te': 'て', 'to': 'と',
-            'da': 'だ', 'di': 'ぢ', 'du': 'づ', 'de': 'で', 'do': 'ど',
-            'na': 'な', 'ni': 'に', 'nu': 'ぬ', 'ne': 'ね', 'no': 'の',
-            'ha': 'は', 'hi': 'ひ', 'fu': 'ふ', 'he': 'へ', 'ho': 'ほ',
-            'ba': 'ば', 'bi': 'び', 'bu': 'ぶ', 'be': 'べ', 'bo': 'ぼ',
-            'pa': 'ぱ', 'pi': 'ぴ', 'pu': 'ぷ', 'pe': 'ぺ', 'po': 'ぽ',
-            'ma': 'ま', 'mi': 'み', 'mu': 'む', 'me': 'め', 'mo': 'も',
-            'ya': 'や', 'yu': 'ゆ', 'yo': 'よ',
-            'ra': 'ら', 'ri': 'り', 'ru': 'る', 're': 'れ', 'ro': 'ろ',
-            'wa': 'わ', 'wi': 'ゐ', 'we': 'ゑ', 'wo': 'を', 'n': 'ん',
-            'kya': 'きゃ', 'kyu': 'きゅ', 'kyo': 'きょ',
-            'gya': 'ぎゃ', 'gyu': 'ぎゅ', 'gyo': 'ぎょ',
-            'sha': 'しゃ', 'shu': 'しゅ', 'sho': 'しょ',
-            'ja': 'じゃ', 'ju': 'じゅ', 'jo': 'じょ',
-            'cha': 'ちゃ', 'chu': 'ちゅ', 'cho': 'ちょ',
-            'nya': 'にゃ', 'nyu': 'にゅ', 'nyo': 'にょ',
-            'hya': 'ひゃ', 'hyu': 'ひゅ', 'hyo': 'ひょ',
-            'bya': 'びゃ', 'byu': 'びゅ', 'byo': 'びょ',
-            'pya': 'ぴゃ', 'pyu': 'ぴゅ', 'pyo': 'ぴょ',
-            'mya': 'みゃ', 'myu': 'みゅ', 'myo': 'みょ',
-            'rya': 'りゃ', 'ryu': 'りゅ', 'ryo': 'りょ',
-            'si': 'し', 'ti': 'ち', 'tu': 'つ', 'zi': 'じ',
-            'nn': 'ん', 'xya': 'ゃ', 'xyu': 'ゅ', 'xyo': 'ょ',
-            'xa': 'ぁ', 'xi': 'ぃ', 'xu': 'ぅ', 'xe': 'ぇ', 'xo': 'ぉ',
-            'xtu': 'っ', 'xtsu': 'っ', 'ltu': 'っ', 'ltsu': 'っ',
-            'xwa': 'ゎ', 'xke': 'ゖ', 'xka': 'ゕ'
-        };
 
-        // Fungsi konversi yang diperbaiki
-        const convertToHiragana = (text) => {
-            let result = '';
-            let i = 0;
-
-            while (i < text.length) {
-                let matched = false;
-
-                // Cek dari yang paling panjang ke yang paling pendek
-                for (let len = 4; len >= 1; len--) {
-                    if (i + len <= text.length) {
-                        const substr = text.substring(i, i + len).toLowerCase();
-                        if (romajiToHiragana[substr]) {
-                            result += romajiToHiragana[substr];
-                            i += len;
-                            matched = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!matched) {
-                    result += text[i];
-                    i++;
-                }
-            }
-
-            return result;
-        };
-
-        // Handler untuk TinyMCE dengan konversi otomatis
-        const handleTinyMCEInput = (content, editor) => {
-            // Dapatkan posisi cursor
-            const bookmark = editor.selection.getBookmark();
-
-            // Konversi content
-            const convertedContent = convertToHiragana(content);
-
-            // Update content jika ada perubahan
-            if (convertedContent !== content) {
-                essayAnswer.value = convertedContent;
-                editor.setContent(convertedContent);
-
-                // Restore posisi cursor
-                setTimeout(() => {
-                    editor.selection.moveToBookmark(bookmark);
-                }, 10);
-            } else {
-                essayAnswer.value = content;
-            }
-        };
-
-        // Konfigurasi TinyMCE
         const tinymceConfig = {
             height: 300,
             menubar: false,
@@ -473,37 +340,14 @@ export default {
                 'insertdatetime', 'media', 'table', 'preview', 'help', 'wordcount'
             ],
             toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }',
-            setup: (editor) => {
-                // Setup event listener untuk konversi real-time
-                editor.on('input', (e) => {
-                    const content = editor.getContent({ format: 'text' });
-                    handleTinyMCEInput(content, editor);
-                });
-
-                // Handle paste event
-                editor.on('paste', (e) => {
-                    setTimeout(() => {
-                        const content = editor.getContent({ format: 'text' });
-                        handleTinyMCEInput(content, editor);
-                    }, 10);
-                });
-            }
+            content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }'
         };
 
-        //define state counter
         const counter = ref(0);
-
-        //define state duration
         const duration = ref(props.duration.duration);
-
-        // Multiple choice selections
         const selectedAnswers = ref([]);
-
-        // Essay answer
         const essayAnswer = ref('');
 
-        // Initialize answer data based on question type
         onMounted(() => {
             if (props.question_active) {
                 if (props.question_active.question.question_type === 'multiple') {
@@ -515,13 +359,11 @@ export default {
                         console.error("Error parsing selected answers:", e);
                     }
                 } else if (props.question_active.question.question_type === 'essay') {
-                    // Load the essay answer if it exists
                     essayAnswer.value = props.question_active.essay_answer || '';
                 }
             }
         });
 
-        // Watch for changes in active question to update essay answer
         watch(() => props.question_active, (newVal) => {
             if (newVal && newVal.question.question_type === 'essay') {
                 essayAnswer.value = newVal.essay_answer || '';
@@ -535,7 +377,6 @@ export default {
             }
         });
 
-        // Helper methods for question type styling
         const getQuestionTypeLabel = ((type) => {
             switch (type) {
                 case 'single':
@@ -575,12 +416,10 @@ export default {
             }
         });
 
-        // Check if an answer is selected in multiple choice
         const isAnswerSelected = ((answer) => {
             return selectedAnswers.value.includes(answer);
         });
 
-        // Toggle selection for multiple choice
         const toggleMultipleAnswer = ((answer) => {
             const index = selectedAnswers.value.indexOf(answer);
             if (index === -1) {
@@ -590,7 +429,6 @@ export default {
             }
         });
 
-        // Submit multiple answers
         const submitMultipleAnswers = ((exam_id, question_id) => {
             Inertia.post('/student/exam-answer', {
                 exam_id: exam_id,
@@ -613,9 +451,7 @@ export default {
             });
         });
 
-        // Submit essay answer
         const submitEssayAnswer = ((exam_id, question_id) => {
-            // Show loading indicator
             Swal.fire({
                 position: 'top-end',
                 icon: 'info',
@@ -656,7 +492,6 @@ export default {
             });
         });
 
-        // Check if a question has been answered (works for all types)
         const questionIsAnswered = ((question) => {
             if (question.question.question_type === 'single') {
                 return question.answer !== 0;
@@ -673,19 +508,12 @@ export default {
             return false;
         });
 
-        //handleChangeDuration
         const handleChangeDuration = (() => {
-            //decrement duration
             duration.value = duration.value - 1000;
-
-            //increment counter
             counter.value = counter.value + 1;
 
-            //cek jika durasi di atas 0
             if (duration.value > 0) {
-                //update duration if 10 seconds
                 if (counter.value % 10 == 1) {
-                    //update duration
                     axios.put(`/student/exam-duration/update/${props.duration.id}`, {
                         duration: duration.value
                     })
@@ -693,40 +521,27 @@ export default {
             }
         });
 
-        //method prevPage
         const prevPage = (() => {
-            //update duration
             axios.put(`/student/exam-duration/update/${props.duration.id}`, {
                 duration: duration.value
             });
-
-            //redirect to prevPage
             Inertia.get(`/student/exam/${props.id}/${props.page - 1}`);
         });
 
-        //method nextPage
         const nextPage = (() => {
-            //update duration
             axios.put(`/student/exam-duration/update/${props.duration.id}`, {
                 duration: duration.value
             });
-
-            //redirect to nextPage
             Inertia.get(`/student/exam/${props.id}/${props.page + 1}`);
         });
 
-        //method clickQuestion
         const clickQuestion = ((index) => {
-            //update duration
             axios.put(`/student/exam-duration/update/${props.duration.id}`, {
                 duration: duration.value
             });
-
-            //redirect to question
             Inertia.get(`/student/exam/${props.id}/${index + 1}`);
         });
 
-        //method submit answer for single choice
         const submitAnswer = ((exam_id, question_id, answer) => {
             Inertia.post('/student/exam-answer', {
                 exam_id: exam_id,
@@ -735,9 +550,8 @@ export default {
                 answer: answer,
                 duration: duration.value
             }, {
-                preserveScroll: true, // Keep the scroll position
+                preserveScroll: true,
                 onSuccess: () => {
-                    // Show a small notification
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
@@ -750,13 +564,10 @@ export default {
             });
         });
 
-        //define state modal
         const showModalEndExam = ref(false);
         const showModalEndTimeExam = ref(false);
 
-        //method endExam
         const endExam = (() => {
-            // Show loading state
             Swal.fire({
                 title: 'Memproses...',
                 text: 'Sedang menyimpan hasil ujian',
@@ -772,7 +583,6 @@ export default {
                 exam_session_id: props.exam_group.exam_session.id,
             }, {
                 onSuccess: () => {
-                    // Close the processing dialog and show success
                     Swal.fire({
                         title: 'Berhasil!',
                         text: 'Ujian Selesai! Mengalihkan ke halaman hasil...',
@@ -784,7 +594,6 @@ export default {
             });
         });
 
-        //return
         return {
             options,
             duration,
@@ -796,30 +605,23 @@ export default {
             showModalEndExam,
             showModalEndTimeExam,
             endExam,
-            // Multiple choice methods
             selectedAnswers,
             isAnswerSelected,
             toggleMultipleAnswer,
             submitMultipleAnswers,
             questionIsAnswered,
-            // Essay methods
             essayAnswer,
             submitEssayAnswer,
-            // Helper methods for UI
             getQuestionTypeLabel,
             getQuestionTypeBadgeClass,
             getQuestionTypeButtonClass,
-            // TinyMCE methods
-            handleTinyMCEInput,
-            tinymceConfig,
-            convertToHiragana
+            tinymceConfig
         }
     }
 }
 </script>
 
 <style>
-/* Question type colors */
 .bg-purple {
     background-color: #6f42c1;
     color: white;
@@ -840,7 +642,6 @@ export default {
     color: white;
 }
 
-/* Selected option styling */
 .option-content.selected {
     background-color: #e7f3ff;
     border-radius: 0.25rem;
@@ -848,13 +649,23 @@ export default {
     border-left: 4px solid #0d6efd;
 }
 
-/* Essay input styling */
+.option-content {
+    cursor: pointer;
+}
+
+.option-content img {
+    transition: transform 0.2s;
+}
+
+.option-content:hover img {
+    transform: scale(1.02);
+}
+
 #essay-answer:focus {
     border-color: #ffc107;
     box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
 }
 
-/* Navigation button styling */
 .question-button {
     font-weight: bold;
     height: 32px;
@@ -865,7 +676,6 @@ export default {
     margin-bottom: 5px;
 }
 
-/* Style for question navigation with question type indicators */
 .question-nav .btn-warning,
 .question-nav .btn-outline-warning {
     position: relative;

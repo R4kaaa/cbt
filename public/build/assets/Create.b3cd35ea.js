@@ -61,9 +61,11 @@ const A = { layout: V, components: { Head: x, Link: p, Editor: M }, props: { err
     Ds = s("button", { type: "submit", class: "btn btn-md btn-primary border-0 shadow me-2" }, "Simpan", -1),
     Ys = s("button", { type: "reset", class: "btn btn-md btn-warning border-0 shadow" }, "Reset", -1);
 
-function Bs(l, t, e, n, Cs, Es) { const y = u("Head"),
+function Bs(l, t, e, n, Cs, Es) {
+    const y = u("Head"),
         g = u("Link"),
-        U = u("Editor"); return a(), i(f, null, [h(y, null, { default: b(() => [D]), _: 1 }), s("div", Y, [s("div", B, [s("div", C, [h(g, { href: "/admin/exams", class: "btn btn-md btn-primary border-0 shadow mb-3", type: "button" }, { default: b(() => [E, H]), _: 1 }), s("div", T, [s("div", z, [F, K, s("form", { onSubmit: t[8] || (t[8] = j((...o) => n.submit && n.submit(...o), ["prevent"])) }, [s("div", O, [I, c(s("input", { type: "text", class: "form-control", placeholder: "Masukkan Nama Ujian", "onUpdate:modelValue": t[0] || (t[0] = o => n.form.title = o) }, null, 512), [
+        U = u("Editor");
+    return a(), i(f, null, [h(y, null, { default: b(() => [D]), _: 1 }), s("div", Y, [s("div", B, [s("div", C, [h(g, { href: "/admin/exams", class: "btn btn-md btn-primary border-0 shadow mb-3", type: "button" }, { default: b(() => [E, H]), _: 1 }), s("div", T, [s("div", z, [F, K, s("form", { onSubmit: t[8] || (t[8] = j((...o) => n.submit && n.submit(...o), ["prevent"])) }, [s("div", O, [I, c(s("input", { type: "text", class: "form-control", placeholder: "Masukkan Nama Ujian", "onUpdate:modelValue": t[0] || (t[0] = o => n.form.title = o) }, null, 512), [
         [v, n.form.title]
     ]), e.errors.title ? (a(), i("div", J, r(e.errors.title), 1)) : d("", !0)]), s("div", R, [s("div", G, [s("div", P, [Q, c(s("select", { class: "form-select", "onUpdate:modelValue": t[1] || (t[1] = o => n.form.lesson_id = o) }, [(a(!0), i(f, null, w(e.lessons, (o, m) => (a(), i("option", { key: m, value: o.id }, r(o.title), 9, W))), 128))], 512), [
         [_, n.form.lesson_id]
@@ -77,7 +79,8 @@ function Bs(l, t, e, n, Cs, Es) { const y = u("Head"),
         [_, n.form.show_answer]
     ]), e.errors.show_answer ? (a(), i("div", qs, r(e.errors.show_answer), 1)) : d("", !0)])]), s("div", Ss, [s("div", Ms, [Ls, c(s("input", { type: "number", min: "1", class: "form-control", placeholder: "Masukkan Durasi Ujian (Menit)", "onUpdate:modelValue": t[7] || (t[7] = o => n.form.duration = o) }, null, 512), [
         [v, n.form.duration]
-    ]), e.errors.duration ? (a(), i("div", As, r(e.errors.duration), 1)) : d("", !0)])])]), Ds, Ys], 32)])])])])])], 64) }
+    ]), e.errors.duration ? (a(), i("div", As, r(e.errors.duration), 1)) : d("", !0)])])]), Ds, Ys], 32)])])])])])], 64)
+}
 const Os = L(A, [
     ["render", Bs]
 ]);

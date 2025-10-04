@@ -3,19 +3,55 @@ import { H as z, L as T, r as J, m as U, a as k, o as l, c as n, b as _, w as j,
 import { S as L } from "./sweetalert2.all.1d02a522.js";
 import { E as D } from "./Editor.d079d9f6.js";
 import { _ as G } from "./_plugin-vue_export-helper.cdc0426e.js";
-const I = { layout: C, components: { Head: z, Link: T, Editor: D }, props: { errors: Object, exam: Object }, setup(w) { const o = J({ question: "", option_1: "", option_2: "", option_3: "", option_4: "", option_5: "", question_type: "single", media_type: "none", answer: "1", answers: [], essay_answer: "", question_image: null, audio_file: null }),
+const I = {
+        layout: C,
+        components: { Head: z, Link: T, Editor: D },
+        props: { errors: Object, exam: Object },
+        setup(w) {
+            const o = J({ question: "", option_1: "", option_2: "", option_3: "", option_4: "", option_5: "", question_type: "single", media_type: "none", answer: "1", answers: [], essay_answer: "", question_image: null, audio_file: null }),
                 s = U(null),
                 t = U(null),
                 g = { a: "\u3042", i: "\u3044", u: "\u3046", e: "\u3048", o: "\u304A", ka: "\u304B", ki: "\u304D", ku: "\u304F", ke: "\u3051", ko: "\u3053", ga: "\u304C", gi: "\u304E", gu: "\u3050", ge: "\u3052", go: "\u3054", sa: "\u3055", shi: "\u3057", su: "\u3059", se: "\u305B", so: "\u305D", za: "\u3056", ji: "\u3058", zu: "\u305A", ze: "\u305C", zo: "\u305E", ta: "\u305F", chi: "\u3061", tsu: "\u3064", te: "\u3066", to: "\u3068", da: "\u3060", di: "\u3062", du: "\u3065", de: "\u3067", do: "\u3069", na: "\u306A", ni: "\u306B", nu: "\u306C", ne: "\u306D", no: "\u306E", ha: "\u306F", hi: "\u3072", hu: "\u3075", he: "\u3078", ho: "\u307B", ba: "\u3070", bi: "\u3073", bu: "\u3076", be: "\u3079", bo: "\u307C", pa: "\u3071", pi: "\u3074", pu: "\u3077", pe: "\u307A", po: "\u307D", ma: "\u307E", mi: "\u307F", mu: "\u3080", me: "\u3081", mo: "\u3082", ya: "\u3084", yu: "\u3086", yo: "\u3088", ra: "\u3089", ri: "\u308A", ru: "\u308B", re: "\u308C", ro: "\u308D", wa: "\u308F", wi: "\u3090", we: "\u3091", wo: "\u3092", n: "\u3093", kya: "\u304D\u3083", kyu: "\u304D\u3085", kyo: "\u304D\u3087", gya: "\u304E\u3083", gyu: "\u304E\u3085", gyo: "\u304E\u3087", sha: "\u3057\u3083", shu: "\u3057\u3085", sho: "\u3057\u3087", ja: "\u3058\u3083", ju: "\u3058\u3085", jo: "\u3058\u3087", cha: "\u3061\u3083", chu: "\u3061\u3085", cho: "\u3061\u3087", nya: "\u306B\u3083", nyu: "\u306B\u3085", nyo: "\u306B\u3087", hya: "\u3072\u3083", hyu: "\u3072\u3085", hyo: "\u3072\u3087", bya: "\u3073\u3083", byu: "\u3073\u3085", byo: "\u3073\u3087", pya: "\u3074\u3083", pyu: "\u3074\u3085", pyo: "\u3074\u3087", mya: "\u307F\u3083", myu: "\u307F\u3085", myo: "\u307F\u3087", rya: "\u308A\u3083", ryu: "\u308A\u3085", ryo: "\u308A\u3087", fu: "\u3075", si: "\u3057", ti: "\u3061", tu: "\u3064", zi: "\u3058", nn: "\u3093", xya: "\u3083", xyu: "\u3085", xyo: "\u3087", xa: "\u3041", xi: "\u3043", xu: "\u3045", xe: "\u3047", xo: "\u3049", xtu: "\u3063", xtsu: "\u3063", ltu: "\u3063", ltsu: "\u3063", xwa: "\u308E", xke: "\u3096", xka: "\u3095" },
-                v = a => { let r = "",
-                        u = 0; for (; u < a.length;) { let p = !1; for (let h = 4; h >= 1; h--)
+                v = a => {
+                    let r = "",
+                        u = 0;
+                    for (; u < a.length;) {
+                        let p = !1;
+                        for (let h = 4; h >= 1; h--)
                             if (u + h <= a.length) { const V = a.substring(u, u + h); if (g[V]) { r += g[V], u += h, p = !0; break } }
-                        p || (r += a[u], u++) } return r }; return { form: o, imagePreview: s, audioPreview: t, handleImageUpload: a => { const r = a.target.files[0];
-                    r && (o.question_image = r, s.value = URL.createObjectURL(r), o.audio_file = null, t.value = null) }, handleAudioUpload: a => { const r = a.target.files[0];
-                    r && (o.audio_file = r, t.value = URL.createObjectURL(r), o.question_image = null, s.value = null) }, setupTinyMCEJapanese: a => { a.on("keyup", r => { const u = a.getContent({ format: "text" }),
-                            p = v(u); if (u !== p) { const h = a.selection.getBookmark();
-                            a.setContent(p), a.selection.moveToBookmark(h) } }) }, submit: () => { const a = new FormData;
-                    a.append("question", o.question), a.append("question_type", o.question_type), a.append("media_type", o.media_type), o.question_type === "single" || o.question_type === "multiple" ? (a.append("option_1", o.option_1), a.append("option_2", o.option_2), a.append("option_3", o.option_3), a.append("option_4", o.option_4), a.append("option_5", o.option_5), o.question_type === "single" ? a.append("answer", o.answer) : o.answers.forEach(r => { a.append("answers[]", r) })) : o.question_type === "essay" && a.append("essay_answer", o.essay_answer), o.media_type === "image" && o.question_image && a.append("question_image", o.question_image), o.media_type === "audio" && o.audio_file && a.append("audio_file", o.audio_file), S.Inertia.post(`/admin/exams/${w.exam.id}/questions/store`, a, { forceFormData: !0, onSuccess: () => { L.fire({ title: "Success!", text: "Soal Ujian Berhasil Disimpan!", icon: "success", showConfirmButton: !1, timer: 2e3 }) } }) } } } },
+                        p || (r += a[u], u++)
+                    }
+                    return r
+                };
+            return {
+                form: o,
+                imagePreview: s,
+                audioPreview: t,
+                handleImageUpload: a => {
+                    const r = a.target.files[0];
+                    r && (o.question_image = r, s.value = URL.createObjectURL(r), o.audio_file = null, t.value = null)
+                },
+                handleAudioUpload: a => {
+                    const r = a.target.files[0];
+                    r && (o.audio_file = r, t.value = URL.createObjectURL(r), o.question_image = null, s.value = null)
+                },
+                setupTinyMCEJapanese: a => {
+                    a.on("keyup", r => {
+                        const u = a.getContent({ format: "text" }),
+                            p = v(u);
+                        if (u !== p) {
+                            const h = a.selection.getBookmark();
+                            a.setContent(p), a.selection.moveToBookmark(h)
+                        }
+                    })
+                },
+                submit: () => {
+                    const a = new FormData;
+                    a.append("question", o.question), a.append("question_type", o.question_type), a.append("media_type", o.media_type), o.question_type === "single" || o.question_type === "multiple" ? (a.append("option_1", o.option_1), a.append("option_2", o.option_2), a.append("option_3", o.option_3), a.append("option_4", o.option_4), a.append("option_5", o.option_5), o.question_type === "single" ? a.append("answer", o.answer) : o.answers.forEach(r => { a.append("answers[]", r) })) : o.question_type === "essay" && a.append("essay_answer", o.essay_answer), o.media_type === "image" && o.question_image && a.append("question_image", o.question_image), o.media_type === "audio" && o.audio_file && a.append("audio_file", o.audio_file), S.Inertia.post(`/admin/exams/${w.exam.id}/questions/store`, a, { forceFormData: !0, onSuccess: () => { L.fire({ title: "Success!", text: "Soal Ujian Berhasil Disimpan!", icon: "success", showConfirmButton: !1, timer: 2e3 }) } })
+                }
+            }
+        }
+    },
     F = e("title", null, "Tambah Soal Ujian - Aplikasi Ujian Online", -1),
     H = { class: "container-fluid mb-5 mt-5" },
     N = { class: "row" },
@@ -97,9 +133,11 @@ const I = { layout: C, components: { Head: z, Link: T, Editor: D }, props: { err
     _o = e("button", { type: "submit", class: "btn btn-md btn-primary border-0 shadow me-2" }, "Simpan", -1),
     fo = e("button", { type: "reset", class: "btn btn-md btn-warning border-0 shadow" }, "Reset", -1);
 
-function ho(w, o, s, t, g, v) { const x = k("Head"),
+function ho(w, o, s, t, g, v) {
+    const x = k("Head"),
         q = k("Link"),
-        f = k("Editor"); return l(), n(E, null, [_(x, null, { default: j(() => [F]), _: 1 }), e("div", H, [e("div", N, [e("div", O, [_(q, { href: `/admin/exams/${s.exam.id}`, class: "btn btn-md btn-primary border-0 shadow mb-3", type: "button" }, { default: j(() => [R, K]), _: 1 }, 8, ["href"]), e("div", W, [e("div", Q, [X, Y, e("form", { onSubmit: o[21] || (o[21] = P((...i) => t.submit && t.submit(...i), ["prevent"])), enctype: "multipart/form-data" }, [e("div", Z, [$, e("div", ee, [e("div", oe, [c(e("input", { class: "form-check-input", type: "radio", "onUpdate:modelValue": o[0] || (o[0] = i => t.form.question_type = i), value: "single", id: "single", checked: "" }, null, 512), [
+        f = k("Editor");
+    return l(), n(E, null, [_(x, null, { default: j(() => [F]), _: 1 }), e("div", H, [e("div", N, [e("div", O, [_(q, { href: `/admin/exams/${s.exam.id}`, class: "btn btn-md btn-primary border-0 shadow mb-3", type: "button" }, { default: j(() => [R, K]), _: 1 }, 8, ["href"]), e("div", W, [e("div", Q, [X, Y, e("form", { onSubmit: o[21] || (o[21] = P((...i) => t.submit && t.submit(...i), ["prevent"])), enctype: "multipart/form-data" }, [e("div", Z, [$, e("div", ee, [e("div", oe, [c(e("input", { class: "form-check-input", type: "radio", "onUpdate:modelValue": o[0] || (o[0] = i => t.form.question_type = i), value: "single", id: "single", checked: "" }, null, 512), [
         [y, t.form.question_type]
     ]), te]), e("div", ie, [c(e("input", { class: "form-check-input", type: "radio", "onUpdate:modelValue": o[1] || (o[1] = i => t.form.question_type = i), value: "multiple", id: "multiple" }, null, 512), [
         [y, t.form.question_type]
@@ -123,7 +161,8 @@ function ho(w, o, s, t, g, v) { const x = k("Head"),
         [b, t.form.answers]
     ]), so]), e("div", ao, [c(e("input", { class: "form-check-input", type: "checkbox", "onUpdate:modelValue": o[19] || (o[19] = i => t.form.answers = i), value: "5", id: "answer5" }, null, 512), [
         [b, t.form.answers]
-    ]), lo]), s.errors.answers ? (l(), n("div", no, m(s.errors.answers), 1)) : d("", !0)])])) : d("", !0)], 64)) : d("", !0), t.form.question_type === "essay" ? (l(), n("tr", ro, [mo, e("td", null, [_(f, { "api-key": "f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr", modelValue: t.form.essay_answer, "onUpdate:modelValue": o[20] || (o[20] = i => t.form.essay_answer = i), init: { height: 200, menubar: !1, plugins: "lists link image emoticons", toolbar: "styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons", setup: t.setupTinyMCEJapanese } }, null, 8, ["modelValue", "init"]), s.errors.essay_answer ? (l(), n("div", co, m(s.errors.essay_answer), 1)) : d("", !0), uo])])) : d("", !0)])])]), _o, fo], 32)])])])])])], 64) }
+    ]), lo]), s.errors.answers ? (l(), n("div", no, m(s.errors.answers), 1)) : d("", !0)])])) : d("", !0)], 64)) : d("", !0), t.form.question_type === "essay" ? (l(), n("tr", ro, [mo, e("td", null, [_(f, { "api-key": "f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr", modelValue: t.form.essay_answer, "onUpdate:modelValue": o[20] || (o[20] = i => t.form.essay_answer = i), init: { height: 200, menubar: !1, plugins: "lists link image emoticons", toolbar: "styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons", setup: t.setupTinyMCEJapanese } }, null, 8, ["modelValue", "init"]), s.errors.essay_answer ? (l(), n("div", co, m(s.errors.essay_answer), 1)) : d("", !0), uo])])) : d("", !0)])])]), _o, fo], 32)])])])])])], 64)
+}
 const wo = G(I, [
     ["render", ho]
 ]);

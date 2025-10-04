@@ -109,10 +109,10 @@
                                         </td>
                                         <td>
                                             <span class="badge bg-primary">{{ history.exam_group.exam.lesson.title
-                                                }}</span>
+                                            }}</span>
                                             <br>
                                             <small class="text-muted">KKM: {{ history.exam_group.exam.lesson.kkm
-                                                }}</small>
+                                            }}</small>
                                         </td>
                                         <td>
                                             <strong>{{ history.exam_group.exam_session.title }}</strong>
@@ -226,9 +226,7 @@
                                             <i class="fa fa-percentage me-2"></i> Tingkat Kelulusan
                                         </h6>
                                         <h3 class="text-info mb-0">
-                                            {{ overall_stats.completed_exams > 0 ?
-                                                Math.round((overall_stats.passed_exams / overall_stats.completed_exams) *
-                                            100) : 0 }}%
+                                            {{ overall_stats.completed_exams > 0 ? Math.round((overall_stats.passed_exams / overall_stats.completed_exams) * 100) : 0 }}%
                                         </h3>
                                     </div>
                                 </div>

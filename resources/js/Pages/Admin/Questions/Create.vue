@@ -107,8 +107,7 @@
                                                     v-model="form.question" :init="{
                                                         menubar: false,
                                                         plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
-                                                        setup: setupTinyMCEJapanese
+                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
                                                     }" />
                                                 <div v-if="errors.question" class="mt-2 text-danger">
                                                     {{ errors.question }}
@@ -118,82 +117,173 @@
                                         <template
                                             v-if="form.question_type === 'single' || form.question_type === 'multiple'">
                                             <tr>
+                                                <td style="width:20%" class="fw-bold">Tipe Pilihan Jawaban</td>
+                                                <td>
+                                                    <div class="d-flex">
+                                                        <div class="form-check me-4">
+                                                            <input class="form-check-input" type="radio"
+                                                                v-model="form.option_type" value="text" id="optionText"
+                                                                checked>
+                                                            <label class="form-check-label" for="optionText">
+                                                                Teks
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                v-model="form.option_type" value="image"
+                                                                id="optionImage">
+                                                            <label class="form-check-label" for="optionImage">
+                                                                Gambar
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_type" class="mt-2 text-danger">
+                                                        {{ errors.option_type }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan A</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_1" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
-                                                            setup: setupTinyMCEJapanese
-                                                        }" />
-                                                    <div v-if="errors.option_1" class="mt-2 text-danger">
-                                                        {{ errors.option_1 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_1" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption1Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option1Preview" class="mt-3">
+                                                            <img :src="option1Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_1 || errors.option_1_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_1 || errors.option_1_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan B</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_2" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
-                                                            setup: setupTinyMCEJapanese
-                                                        }" />
-                                                    <div v-if="errors.option_2" class="mt-2 text-danger">
-                                                        {{ errors.option_2 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_2" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption2Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option2Preview" class="mt-3">
+                                                            <img :src="option2Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_2 || errors.option_2_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_2 || errors.option_2_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan C</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_3" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
-                                                            setup: setupTinyMCEJapanese
-                                                        }" />
-                                                    <div v-if="errors.option_3" class="mt-2 text-danger">
-                                                        {{ errors.option_3 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_3" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption3Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option3Preview" class="mt-3">
+                                                            <img :src="option3Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_3 || errors.option_3_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_3 || errors.option_3_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan D</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_4" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
-                                                            setup: setupTinyMCEJapanese
-                                                        }" />
-                                                    <div v-if="errors.option_4" class="mt-2 text-danger">
-                                                        {{ errors.option_4 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_4" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption4Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option4Preview" class="mt-3">
+                                                            <img :src="option4Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_4 || errors.option_4_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_4 || errors.option_4_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan E</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_5" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
-                                                            setup: setupTinyMCEJapanese
-                                                        }" />
-                                                    <div v-if="errors.option_5" class="mt-2 text-danger">
-                                                        {{ errors.option_5 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_5" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption5Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option5Preview" class="mt-3">
+                                                            <img :src="option5Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_5 || errors.option_5_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_5 || errors.option_5_image }}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -264,8 +354,7 @@
                                                         height: 200,
                                                         menubar: false,
                                                         plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons',
-                                                        setup: setupTinyMCEJapanese
+                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
                                                     }" />
                                                 <div v-if="errors.essay_answer" class="mt-2 text-danger">
                                                     {{ errors.essay_answer }}
@@ -294,7 +383,7 @@ import {
     Head,
     Link
 } from '@inertiajs/inertia-vue3';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
 import Swal from 'sweetalert2';
 import Editor from '@tinymce/tinymce-vue';
@@ -320,89 +409,47 @@ export default {
             option_5: '',
             question_type: 'single',
             media_type: 'none',
+            option_type: 'text',
             answer: '1',
             answers: [],
             essay_answer: '',
             question_image: null,
             audio_file: null,
+            option_1_image: null,
+            option_2_image: null,
+            option_3_image: null,
+            option_4_image: null,
+            option_5_image: null,
         });
 
         const imagePreview = ref(null);
         const audioPreview = ref(null);
+        const option1Preview = ref(null);
+        const option2Preview = ref(null);
+        const option3Preview = ref(null);
+        const option4Preview = ref(null);
+        const option5Preview = ref(null);
 
-        const romajiToHiragana = {
-            'a': 'あ', 'i': 'い', 'u': 'う', 'e': 'え', 'o': 'お',
-            'ka': 'か', 'ki': 'き', 'ku': 'く', 'ke': 'け', 'ko': 'こ',
-            'ga': 'が', 'gi': 'ぎ', 'gu': 'ぐ', 'ge': 'げ', 'go': 'ご',
-            'sa': 'さ', 'shi': 'し', 'su': 'す', 'se': 'せ', 'so': 'そ',
-            'za': 'ざ', 'ji': 'じ', 'zu': 'ず', 'ze': 'ぜ', 'zo': 'ぞ',
-            'ta': 'た', 'chi': 'ち', 'tsu': 'つ', 'te': 'て', 'to': 'と',
-            'da': 'だ', 'di': 'ぢ', 'du': 'づ', 'de': 'で', 'do': 'ど',
-            'na': 'な', 'ni': 'に', 'nu': 'ぬ', 'ne': 'ね', 'no': 'の',
-            'ha': 'は', 'hi': 'ひ', 'hu': 'ふ', 'he': 'へ', 'ho': 'ほ',
-            'ba': 'ば', 'bi': 'び', 'bu': 'ぶ', 'be': 'べ', 'bo': 'ぼ',
-            'pa': 'ぱ', 'pi': 'ぴ', 'pu': 'ぷ', 'pe': 'ぺ', 'po': 'ぽ',
-            'ma': 'ま', 'mi': 'み', 'mu': 'む', 'me': 'め', 'mo': 'も',
-            'ya': 'や', 'yu': 'ゆ', 'yo': 'よ',
-            'ra': 'ら', 'ri': 'り', 'ru': 'る', 're': 'れ', 'ro': 'ろ',
-            'wa': 'わ', 'wi': 'ゐ', 'we': 'ゑ', 'wo': 'を', 'n': 'ん',
-            'kya': 'きゃ', 'kyu': 'きゅ', 'kyo': 'きょ',
-            'gya': 'ぎゃ', 'gyu': 'ぎゅ', 'gyo': 'ぎょ',
-            'sha': 'しゃ', 'shu': 'しゅ', 'sho': 'しょ',
-            'ja': 'じゃ', 'ju': 'じゅ', 'jo': 'じょ',
-            'cha': 'ちゃ', 'chu': 'ちゅ', 'cho': 'ちょ',
-            'nya': 'にゃ', 'nyu': 'にゅ', 'nyo': 'にょ',
-            'hya': 'ひゃ', 'hyu': 'ひゅ', 'hyo': 'ひょ',
-            'bya': 'びゃ', 'byu': 'びゅ', 'byo': 'びょ',
-            'pya': 'ぴゃ', 'pyu': 'ぴゅ', 'pyo': 'ぴょ',
-            'mya': 'みゃ', 'myu': 'みゅ', 'myo': 'みょ',
-            'rya': 'りゃ', 'ryu': 'りゅ', 'ryo': 'りょ',
-            'fu': 'ふ', 'si': 'し', 'ti': 'ち', 'tu': 'つ', 'zi': 'じ',
-            'nn': 'ん', 'xya': 'ゃ', 'xyu': 'ゅ', 'xyo': 'ょ',
-            'xa': 'ぁ', 'xi': 'ぃ', 'xu': 'ぅ', 'xe': 'ぇ', 'xo': 'ぉ',
-            'xtu': 'っ', 'xtsu': 'っ', 'ltu': 'っ', 'ltsu': 'っ',
-            'xwa': 'ゎ', 'xke': 'ゖ', 'xka': 'ゕ'
-        };
-
-        const convertToHiragana = (text) => {
-            let result = '';
-            let i = 0;
-
-            while (i < text.length) {
-                let matched = false;
-
-                for (let len = 4; len >= 1; len--) {
-                    if (i + len <= text.length) {
-                        const substr = text.substring(i, i + len);
-                        if (romajiToHiragana[substr]) {
-                            result += romajiToHiragana[substr];
-                            i += len;
-                            matched = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!matched) {
-                    result += text[i];
-                    i++;
-                }
+        watch(() => form.option_type, (newVal) => {
+            if (newVal === 'text') {
+                form.option_1_image = null;
+                form.option_2_image = null;
+                form.option_3_image = null;
+                form.option_4_image = null;
+                form.option_5_image = null;
+                option1Preview.value = null;
+                option2Preview.value = null;
+                option3Preview.value = null;
+                option4Preview.value = null;
+                option5Preview.value = null;
+            } else {
+                form.option_1 = '';
+                form.option_2 = '';
+                form.option_3 = '';
+                form.option_4 = '';
+                form.option_5 = '';
             }
-
-            return result;
-        };
-
-        const setupTinyMCEJapanese = (editor) => {
-            editor.on('keyup', (e) => {
-                const content = editor.getContent({ format: 'text' });
-                const converted = convertToHiragana(content);
-                if (content !== converted) {
-                    const bookmark = editor.selection.getBookmark();
-                    editor.setContent(converted);
-                    editor.selection.moveToBookmark(bookmark);
-                }
-            });
-        };
+        });
 
         const handleImageUpload = (e) => {
             const file = e.target.files[0];
@@ -424,6 +471,46 @@ export default {
             }
         };
 
+        const handleOption1Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_1_image = file;
+                option1Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption2Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_2_image = file;
+                option2Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption3Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_3_image = file;
+                option3Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption4Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_4_image = file;
+                option4Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption5Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_5_image = file;
+                option5Preview.value = URL.createObjectURL(file);
+            }
+        };
+
         const submit = () => {
             const formData = new FormData();
 
@@ -432,11 +519,21 @@ export default {
             formData.append('media_type', form.media_type);
 
             if (form.question_type === 'single' || form.question_type === 'multiple') {
-                formData.append('option_1', form.option_1);
-                formData.append('option_2', form.option_2);
-                formData.append('option_3', form.option_3);
-                formData.append('option_4', form.option_4);
-                formData.append('option_5', form.option_5);
+                formData.append('option_type', form.option_type);
+
+                if (form.option_type === 'text') {
+                    formData.append('option_1', form.option_1);
+                    formData.append('option_2', form.option_2);
+                    formData.append('option_3', form.option_3);
+                    formData.append('option_4', form.option_4);
+                    formData.append('option_5', form.option_5);
+                } else {
+                    if (form.option_1_image) formData.append('option_1_image', form.option_1_image);
+                    if (form.option_2_image) formData.append('option_2_image', form.option_2_image);
+                    if (form.option_3_image) formData.append('option_3_image', form.option_3_image);
+                    if (form.option_4_image) formData.append('option_4_image', form.option_4_image);
+                    if (form.option_5_image) formData.append('option_5_image', form.option_5_image);
+                }
 
                 if (form.question_type === 'single') {
                     formData.append('answer', form.answer);
@@ -475,9 +572,18 @@ export default {
             form,
             imagePreview,
             audioPreview,
+            option1Preview,
+            option2Preview,
+            option3Preview,
+            option4Preview,
+            option5Preview,
             handleImageUpload,
             handleAudioUpload,
-            setupTinyMCEJapanese,
+            handleOption1Upload,
+            handleOption2Upload,
+            handleOption3Upload,
+            handleOption4Upload,
+            handleOption5Upload,
             submit,
         };
     }

@@ -26,7 +26,7 @@ class LessonController extends Controller
     {
         $request->validate([
             'title' => 'required|string|unique:lessons',
-            'kkm' => 'required|integer|min:0|max:100',
+            'kkm' => 'required|integer|min:0|max:250',
         ]);
 
         Lesson::create([

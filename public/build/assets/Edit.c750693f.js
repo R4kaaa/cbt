@@ -3,14 +3,37 @@ import { H as U, L as j, m as g, r as A, a as p, o as n, c as a, b as _, w as v,
 import { S as B } from "./sweetalert2.all.1d02a522.js";
 import { E as L } from "./Editor.d079d9f6.js";
 import { _ as M } from "./_plugin-vue_export-helper.cdc0426e.js";
-const I = { layout: V, components: { Head: U, Link: j, Editor: L }, props: { errors: Object, exam: Object, question: Object }, setup(r) { const i = g(r.question.question_image),
+const I = {
+        layout: V,
+        components: { Head: U, Link: j, Editor: L },
+        props: { errors: Object, exam: Object, question: Object },
+        setup(r) {
+            const i = g(r.question.question_image),
                 s = g(r.question.audio_file),
                 t = g(null),
                 y = g(null),
-                l = A({ question: r.question.question, option_1: r.question.option_1, option_2: r.question.option_2, option_3: r.question.option_3, option_4: r.question.option_4, option_5: r.question.option_5, question_type: r.question.question_type || "single", media_type: r.question.media_type || "none", answer: r.question.answer, answers: Array.isArray(r.question.answers) ? r.question.answers : r.question.answers ? r.question.answers.split(",") : [], essay_answer: r.question.essay_answer || "", question_image: null, audio_file: null }); return { form: l, currentImage: i, currentAudio: s, imagePreview: t, audioPreview: y, handleImageUpload: o => { const u = o.target.files[0];
-                    u && (l.question_image = u, t.value = URL.createObjectURL(u), l.audio_file = null, y.value = null) }, handleAudioUpload: o => { const u = o.target.files[0];
-                    u && (l.audio_file = u, y.value = URL.createObjectURL(u), l.question_image = null, t.value = null) }, submit: () => { const o = new FormData;
-                    o.append("question", l.question), o.append("question_type", l.question_type), o.append("media_type", l.media_type), (l.question_type === "single" || l.question_type === "multiple") && (o.append("option_1", l.option_1), o.append("option_2", l.option_2), o.append("option_3", l.option_3), o.append("option_4", l.option_4), o.append("option_5", l.option_5)), l.question_type === "single" ? o.append("answer", l.answer) : l.question_type === "multiple" ? l.answers.forEach(u => { o.append("answers[]", u) }) : l.question_type === "essay" && o.append("essay_answer", l.essay_answer), l.media_type === "image" && l.question_image && o.append("question_image", l.question_image), l.media_type === "audio" && l.audio_file && o.append("audio_file", l.audio_file), P.Inertia.post(`/admin/exams/${r.exam.id}/questions/${r.question.id}/update`, o, { forceFormData: !0, preserveScroll: !0, preserveState: !1, onSuccess: () => { B.fire({ title: "Success!", text: "Soal Ujian Berhasil Diupdate!", icon: "success", showConfirmButton: !1, timer: 2e3 }) } }) } } } },
+                l = A({ question: r.question.question, option_1: r.question.option_1, option_2: r.question.option_2, option_3: r.question.option_3, option_4: r.question.option_4, option_5: r.question.option_5, question_type: r.question.question_type || "single", media_type: r.question.media_type || "none", answer: r.question.answer, answers: Array.isArray(r.question.answers) ? r.question.answers : r.question.answers ? r.question.answers.split(",") : [], essay_answer: r.question.essay_answer || "", question_image: null, audio_file: null });
+            return {
+                form: l,
+                currentImage: i,
+                currentAudio: s,
+                imagePreview: t,
+                audioPreview: y,
+                handleImageUpload: o => {
+                    const u = o.target.files[0];
+                    u && (l.question_image = u, t.value = URL.createObjectURL(u), l.audio_file = null, y.value = null)
+                },
+                handleAudioUpload: o => {
+                    const u = o.target.files[0];
+                    u && (l.audio_file = u, y.value = URL.createObjectURL(u), l.question_image = null, t.value = null)
+                },
+                submit: () => {
+                    const o = new FormData;
+                    o.append("question", l.question), o.append("question_type", l.question_type), o.append("media_type", l.media_type), (l.question_type === "single" || l.question_type === "multiple") && (o.append("option_1", l.option_1), o.append("option_2", l.option_2), o.append("option_3", l.option_3), o.append("option_4", l.option_4), o.append("option_5", l.option_5)), l.question_type === "single" ? o.append("answer", l.answer) : l.question_type === "multiple" ? l.answers.forEach(u => { o.append("answers[]", u) }) : l.question_type === "essay" && o.append("essay_answer", l.essay_answer), l.media_type === "image" && l.question_image && o.append("question_image", l.question_image), l.media_type === "audio" && l.audio_file && o.append("audio_file", l.audio_file), P.Inertia.post(`/admin/exams/${r.exam.id}/questions/${r.question.id}/update`, o, { forceFormData: !0, preserveScroll: !0, preserveState: !1, onSuccess: () => { B.fire({ title: "Success!", text: "Soal Ujian Berhasil Diupdate!", icon: "success", showConfirmButton: !1, timer: 2e3 }) } })
+                }
+            }
+        }
+    },
     G = e("title", null, "Edit Soal Ujian - Aplikasi Ujian Online", -1),
     D = { class: "container-fluid mb-5 mt-5" },
     C = { class: "row" },
@@ -98,9 +121,11 @@ const I = { layout: V, components: { Head: U, Link: j, Editor: L }, props: { err
     _t = e("button", { type: "submit", class: "btn btn-md btn-primary border-0 shadow me-2" }, "Simpan", -1),
     ft = e("button", { type: "reset", class: "btn btn-md btn-warning border-0 shadow" }, "Reset", -1);
 
-function ht(r, i, s, t, y, l) { const k = p("Head"),
+function ht(r, i, s, t, y, l) {
+    const k = p("Head"),
         w = p("Link"),
-        f = p("Editor"); return n(), a(q, null, [_(k, null, { default: v(() => [G]), _: 1 }), e("div", D, [e("div", C, [e("div", F, [_(w, { href: `/admin/exams/${s.exam.id}`, class: "btn btn-md btn-primary border-0 shadow mb-3", type: "button" }, { default: v(() => [J, O]), _: 1 }, 8, ["href"]), e("div", N, [e("div", R, [T, H, e("form", { onSubmit: i[21] || (i[21] = S((...o) => t.submit && t.submit(...o), ["prevent"])), enctype: "multipart/form-data" }, [e("div", K, [W, e("div", Q, [e("div", X, [c(e("input", { class: "form-check-input", type: "radio", "onUpdate:modelValue": i[0] || (i[0] = o => t.form.question_type = o), value: "single", id: "single" }, null, 512), [
+        f = p("Editor");
+    return n(), a(q, null, [_(k, null, { default: v(() => [G]), _: 1 }), e("div", D, [e("div", C, [e("div", F, [_(w, { href: `/admin/exams/${s.exam.id}`, class: "btn btn-md btn-primary border-0 shadow mb-3", type: "button" }, { default: v(() => [J, O]), _: 1 }, 8, ["href"]), e("div", N, [e("div", R, [T, H, e("form", { onSubmit: i[21] || (i[21] = S((...o) => t.submit && t.submit(...o), ["prevent"])), enctype: "multipart/form-data" }, [e("div", K, [W, e("div", Q, [e("div", X, [c(e("input", { class: "form-check-input", type: "radio", "onUpdate:modelValue": i[0] || (i[0] = o => t.form.question_type = o), value: "single", id: "single" }, null, 512), [
         [h, t.form.question_type]
     ]), Y]), e("div", Z, [c(e("input", { class: "form-check-input", type: "radio", "onUpdate:modelValue": i[1] || (i[1] = o => t.form.question_type = o), value: "multiple", id: "multiple" }, null, 512), [
         [h, t.form.question_type]
@@ -124,7 +149,8 @@ function ht(r, i, s, t, y, l) { const k = p("Head"),
         [b, t.form.answers]
     ]), lt]), e("div", nt, [c(e("input", { class: "form-check-input", type: "checkbox", "onUpdate:modelValue": i[19] || (i[19] = o => t.form.answers = o), value: "5", id: "answer5" }, null, 512), [
         [b, t.form.answers]
-    ]), at]), s.errors.answers ? (n(), a("div", dt, m(s.errors.answers), 1)) : d("", !0)])])) : d("", !0)], 64)) : d("", !0), t.form.question_type === "essay" ? (n(), a("tr", rt, [mt, e("td", null, [_(f, { "api-key": "f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr", modelValue: t.form.essay_answer, "onUpdate:modelValue": i[20] || (i[20] = o => t.form.essay_answer = o), init: { height: 200, menubar: !1, plugins: "lists link image emoticons", toolbar: "styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons" } }, null, 8, ["modelValue"]), s.errors.essay_answer ? (n(), a("div", ct, m(s.errors.essay_answer), 1)) : d("", !0), ut])])) : d("", !0)])])]), _t, ft], 32)])])])])])], 64) }
+    ]), at]), s.errors.answers ? (n(), a("div", dt, m(s.errors.answers), 1)) : d("", !0)])])) : d("", !0)], 64)) : d("", !0), t.form.question_type === "essay" ? (n(), a("tr", rt, [mt, e("td", null, [_(f, { "api-key": "f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr", modelValue: t.form.essay_answer, "onUpdate:modelValue": i[20] || (i[20] = o => t.form.essay_answer = o), init: { height: 200, menubar: !1, plugins: "lists link image emoticons", toolbar: "styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons" } }, null, 8, ["modelValue"]), s.errors.essay_answer ? (n(), a("div", ct, m(s.errors.essay_answer), 1)) : d("", !0), ut])])) : d("", !0)])])]), _t, ft], 32)])])])])])], 64)
+}
 const wt = M(I, [
     ["render", ht]
 ]);

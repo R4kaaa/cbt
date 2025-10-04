@@ -14,15 +14,15 @@
                 </div>
                 <form @submit.prevent="submit" class="mt-4">
                     <div class="form-group mb-4">
-                        <label for="email">NIK</label>
+                        <label for="email">Phone</label>
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon1">
                                 <i class="fa fa-key"></i>
                             </span>
-                            <input type="number" class="form-control" v-model="form.nik" placeholder="Nomor Test">
+                            <input type="number" class="form-control" v-model="form.phone" placeholder="Nomor Telepon">
                         </div>
-                        <div v-if="errors.nik" class="alert alert-danger mt-2">
-                            {{ errors.nik }}
+                        <div v-if="errors.phone" class="alert alert-danger mt-2">
+                            {{ errors.phone }}
                         </div>
                     </div>
 
@@ -105,7 +105,7 @@ export default {
     setup() {
         //define form state
         const form = reactive({
-            nik: '',
+            phone: '',
             password: '',
         });
 
@@ -114,7 +114,7 @@ export default {
             //send data to server
             Inertia.post('/students/login', {
                 //data
-                nik: form.nik,
+                phone: form.phone,
                 password: form.password,
             });
         }

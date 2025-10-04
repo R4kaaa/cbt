@@ -123,81 +123,200 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        <!-- Options shown only for single and multiple choice questions -->
                                         <template
                                             v-if="form.question_type === 'single' || form.question_type === 'multiple'">
                                             <tr>
+                                                <td style="width:20%" class="fw-bold">Tipe Pilihan Jawaban</td>
+                                                <td>
+                                                    <div class="d-flex">
+                                                        <div class="form-check me-4">
+                                                            <input class="form-check-input" type="radio"
+                                                                v-model="form.option_type" value="text" id="optionText">
+                                                            <label class="form-check-label" for="optionText">
+                                                                Teks
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                v-model="form.option_type" value="image"
+                                                                id="optionImage">
+                                                            <label class="form-check-label" for="optionImage">
+                                                                Gambar
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_type" class="mt-2 text-danger">
+                                                        {{ errors.option_type }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan A</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_1" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }" />
-                                                    <div v-if="errors.option_1" class="mt-2 text-danger">
-                                                        {{ errors.option_1 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_1" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption1Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option1Preview" class="mt-3">
+                                                            <img :src="option1Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                        <div v-else-if="currentOption1" class="mt-3">
+                                                            <p class="mb-2">Gambar saat ini:</p>
+                                                            <img :src="'/storage/questions/options/' + currentOption1"
+                                                                class="img-fluid" style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_1 || errors.option_1_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_1 || errors.option_1_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan B</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_2" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }" />
-                                                    <div v-if="errors.option_2" class="mt-2 text-danger">
-                                                        {{ errors.option_2 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_2" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption2Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option2Preview" class="mt-3">
+                                                            <img :src="option2Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                        <div v-else-if="currentOption2" class="mt-3">
+                                                            <p class="mb-2">Gambar saat ini:</p>
+                                                            <img :src="'/storage/questions/options/' + currentOption2"
+                                                                class="img-fluid" style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_2 || errors.option_2_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_2 || errors.option_2_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan C</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_3" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }" />
-                                                    <div v-if="errors.option_3" class="mt-2 text-danger">
-                                                        {{ errors.option_3 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_3" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption3Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option3Preview" class="mt-3">
+                                                            <img :src="option3Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                        <div v-else-if="currentOption3" class="mt-3">
+                                                            <p class="mb-2">Gambar saat ini:</p>
+                                                            <img :src="'/storage/questions/options/' + currentOption3"
+                                                                class="img-fluid" style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_3 || errors.option_3_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_3 || errors.option_3_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan D</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_4" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }" />
-                                                    <div v-if="errors.option_4" class="mt-2 text-danger">
-                                                        {{ errors.option_4 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_4" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption4Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option4Preview" class="mt-3">
+                                                            <img :src="option4Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                        <div v-else-if="currentOption4" class="mt-3">
+                                                            <p class="mb-2">Gambar saat ini:</p>
+                                                            <img :src="'/storage/questions/options/' + currentOption4"
+                                                                class="img-fluid" style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_4 || errors.option_4_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_4 || errors.option_4_image }}
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:20%" class="fw-bold">Pilihan E</td>
                                                 <td>
-                                                    <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                        v-model="form.option_5" :init="{
-                                                            height: 130,
-                                                            menubar: false,
-                                                            plugins: 'lists link image emoticons',
-                                                            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                        }" />
-                                                    <div v-if="errors.option_5" class="mt-2 text-danger">
-                                                        {{ errors.option_5 }}
+                                                    <div v-if="form.option_type === 'text'">
+                                                        <Editor
+                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
+                                                            v-model="form.option_5" :init="{
+                                                                height: 130,
+                                                                menubar: false,
+                                                                plugins: 'lists link image emoticons',
+                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
+                                                            }" />
+                                                    </div>
+                                                    <div v-else>
+                                                        <input type="file" class="form-control"
+                                                            @input="handleOption5Upload" accept="image/*" />
+                                                        <small class="text-muted">Format: JPG, JPEG, PNG, GIF. Maksimal:
+                                                            2MB</small>
+                                                        <div v-if="option5Preview" class="mt-3">
+                                                            <img :src="option5Preview" class="img-fluid"
+                                                                style="max-height: 150px;" />
+                                                        </div>
+                                                        <div v-else-if="currentOption5" class="mt-3">
+                                                            <p class="mb-2">Gambar saat ini:</p>
+                                                            <img :src="'/storage/questions/options/' + currentOption5"
+                                                                class="img-fluid" style="max-height: 150px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="errors.option_5 || errors.option_5_image"
+                                                        class="mt-2 text-danger">
+                                                        {{ errors.option_5 || errors.option_5_image }}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -260,7 +379,6 @@
                                                 </td>
                                             </tr>
                                         </template>
-                                        <!-- Essay answer field - only shown for essay questions -->
                                         <tr v-if="form.question_type === 'essay'">
                                             <td style="width:20%" class="fw-bold">Kunci Jawaban Essay</td>
                                             <td>
@@ -293,135 +411,179 @@
 </template>
 
 <script>
-//import layout
 import LayoutAdmin from '../../../Layouts/Admin.vue';
-
-//import Heade and Link from Inertia
-import {
-    Head,
-    Link
-} from '@inertiajs/inertia-vue3';
-
-//import reactive from vue
-import { reactive, ref } from 'vue';
-
-//import inerita adapter
+import { Head, Link } from '@inertiajs/inertia-vue3';
+import { reactive, ref, watch } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
-
-//import sweet alert2
 import Swal from 'sweetalert2';
-
-//import tinyMCE
 import Editor from '@tinymce/tinymce-vue';
 
 export default {
-
-    //layout
     layout: LayoutAdmin,
-
-    //register components
     components: {
         Head,
         Link,
         Editor,
     },
-
-    //props
     props: {
         errors: Object,
         exam: Object,
         question: Object,
     },
-
-    //inisialisasi composition API
     setup(props) {
-        // Store current media for preview
         const currentImage = ref(props.question.question_image);
         const currentAudio = ref(props.question.audio_file);
 
-        // For image and audio preview of newly selected files
+        const currentOption1 = ref(props.question.option_type === 'image' ? props.question.option_1 : null);
+        const currentOption2 = ref(props.question.option_type === 'image' ? props.question.option_2 : null);
+        const currentOption3 = ref(props.question.option_type === 'image' ? props.question.option_3 : null);
+        const currentOption4 = ref(props.question.option_type === 'image' ? props.question.option_4 : null);
+        const currentOption5 = ref(props.question.option_type === 'image' ? props.question.option_5 : null);
+
         const imagePreview = ref(null);
         const audioPreview = ref(null);
+        const option1Preview = ref(null);
+        const option2Preview = ref(null);
+        const option3Preview = ref(null);
+        const option4Preview = ref(null);
+        const option5Preview = ref(null);
 
-        //define form with reactive
         const form = reactive({
             question: props.question.question,
-            option_1: props.question.option_1,
-            option_2: props.question.option_2,
-            option_3: props.question.option_3,
-            option_4: props.question.option_4,
-            option_5: props.question.option_5,
+            option_1: props.question.option_type === 'text' ? props.question.option_1 : '',
+            option_2: props.question.option_type === 'text' ? props.question.option_2 : '',
+            option_3: props.question.option_type === 'text' ? props.question.option_3 : '',
+            option_4: props.question.option_type === 'text' ? props.question.option_4 : '',
+            option_5: props.question.option_type === 'text' ? props.question.option_5 : '',
             question_type: props.question.question_type || 'single',
             media_type: props.question.media_type || 'none',
-            answer: props.question.answer,
+            option_type: props.question.option_type || 'text',
+            answer: props.question.answer ? String(props.question.answer) : null,
             answers: Array.isArray(props.question.answers)
-                ? props.question.answers
-                : (props.question.answers ? props.question.answers.split(',') : []),
-            essay_answer: props.question.essay_answer || '', // Add essay_answer field
-            question_image: null, // File object for new image upload
-            audio_file: null, // File object for new audio upload
+                ? props.question.answers.map(String)
+                : (props.question.answers ? props.question.answers.split(',').map(String) : []),
+            essay_answer: props.question.essay_answer || '',
+            question_image: null,
+            audio_file: null,
+            option_1_image: null,
+            option_2_image: null,
+            option_3_image: null,
+            option_4_image: null,
+            option_5_image: null,
         });
 
-        // Handle image upload
+        watch(() => form.option_type, (newVal) => {
+            if (newVal === 'text') {
+                form.option_1_image = null;
+                form.option_2_image = null;
+                form.option_3_image = null;
+                form.option_4_image = null;
+                form.option_5_image = null;
+                option1Preview.value = null;
+                option2Preview.value = null;
+                option3Preview.value = null;
+                option4Preview.value = null;
+                option5Preview.value = null;
+            } else {
+                form.option_1 = '';
+                form.option_2 = '';
+                form.option_3 = '';
+                form.option_4 = '';
+                form.option_5 = '';
+            }
+        });
+
         const handleImageUpload = (e) => {
             const file = e.target.files[0];
             if (file) {
-                // Store file object in form data
                 form.question_image = file;
-                // Create preview URL
                 imagePreview.value = URL.createObjectURL(file);
-                // Reset audio file if an image is selected
-                form.audio_file = null;
-                audioPreview.value = null;
             }
         };
 
-        // Handle audio upload
         const handleAudioUpload = (e) => {
             const file = e.target.files[0];
             if (file) {
-                // Store file object in form data
                 form.audio_file = file;
-                // Create preview URL
                 audioPreview.value = URL.createObjectURL(file);
-                // Reset image file if audio is selected
-                form.question_image = null;
-                imagePreview.value = null;
             }
         };
 
-        // Method "submit" using FormData for file uploads
+        const handleOption1Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_1_image = file;
+                option1Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption2Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_2_image = file;
+                option2Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption3Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_3_image = file;
+                option3Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption4Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_4_image = file;
+                option4Preview.value = URL.createObjectURL(file);
+            }
+        };
+
+        const handleOption5Upload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                form.option_5_image = file;
+                option5Preview.value = URL.createObjectURL(file);
+            }
+        };
+
         const submit = () => {
-            // Create FormData object
             const formData = new FormData();
 
-            // Append basic form fields
             formData.append('question', form.question);
             formData.append('question_type', form.question_type);
             formData.append('media_type', form.media_type);
 
-            // Add fields based on question type
             if (form.question_type === 'single' || form.question_type === 'multiple') {
-                formData.append('option_1', form.option_1);
-                formData.append('option_2', form.option_2);
-                formData.append('option_3', form.option_3);
-                formData.append('option_4', form.option_4);
-                formData.append('option_5', form.option_5);
-            }
+                formData.append('option_type', form.option_type);
 
-            // Add answer based on question type
-            if (form.question_type === 'single') {
-                formData.append('answer', form.answer);
-            } else if (form.question_type === 'multiple') {
-                // Convert array to JSON string for multiple answers
-                form.answers.forEach(answer => {
-                    formData.append('answers[]', answer);
-                });
+                if (form.option_type === 'text') {
+                    formData.append('option_1', form.option_1);
+                    formData.append('option_2', form.option_2);
+                    formData.append('option_3', form.option_3);
+                    formData.append('option_4', form.option_4);
+                    formData.append('option_5', form.option_5);
+                } else {
+                    if (form.option_1_image) formData.append('option_1_image', form.option_1_image);
+                    if (form.option_2_image) formData.append('option_2_image', form.option_2_image);
+                    if (form.option_3_image) formData.append('option_3_image', form.option_3_image);
+                    if (form.option_4_image) formData.append('option_4_image', form.option_4_image);
+                    if (form.option_5_image) formData.append('option_5_image', form.option_5_image);
+                }
+
+                if (form.question_type === 'single') {
+                    formData.append('answer', form.answer);
+                } else {
+                    form.answers.forEach(answer => {
+                        formData.append('answers[]', answer);
+                    });
+                }
             } else if (form.question_type === 'essay') {
                 formData.append('essay_answer', form.essay_answer);
             }
 
-            // Add files if they exist
             if (form.media_type === 'image' && form.question_image) {
                 formData.append('question_image', form.question_image);
             }
@@ -430,16 +592,12 @@ export default {
                 formData.append('audio_file', form.audio_file);
             }
 
-            // Send data to server using POST method
             Inertia.post(`/admin/exams/${props.exam.id}/questions/${props.question.id}/update`, formData, {
                 forceFormData: true,
-                preserveScroll: true,
-                preserveState: false,
                 onSuccess: () => {
-                    // Show success alert
                     Swal.fire({
                         title: 'Success!',
-                        text: 'Soal Ujian Berhasil Diupdate!',
+                        text: 'Soal Ujian Berhasil Disimpan!',
                         icon: 'success',
                         showConfirmButton: false,
                         timer: 2000
@@ -448,17 +606,31 @@ export default {
             });
         };
 
-        //return
         return {
             form,
             currentImage,
             currentAudio,
+            currentOption1,
+            currentOption2,
+            currentOption3,
+            currentOption4,
+            currentOption5,
             imagePreview,
             audioPreview,
+            option1Preview,
+            option2Preview,
+            option3Preview,
+            option4Preview,
+            option5Preview,
             handleImageUpload,
             handleAudioUpload,
+            handleOption1Upload,
+            handleOption2Upload,
+            handleOption3Upload,
+            handleOption4Upload,
+            handleOption5Upload,
             submit,
-        }
+        };
     }
 }
 </script>

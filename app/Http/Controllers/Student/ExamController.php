@@ -136,7 +136,6 @@ class ExamController extends Controller
 
     public function show($id, $page)
     {
-        //get exam group
         $exam_group = ExamGroup::with('exam.lesson', 'exam_session', 'student.classroom')
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('id', $id)
@@ -146,33 +145,30 @@ class ExamController extends Controller
             return redirect()->route('student.dashboard');
         }
 
-        //get all questions dengan urutan berdasarkan question_order
         $all_questions = Answer::with(['question' => function ($query) {
             $query->select('id', 'exam_id', 'question', 'question_type', 'media_type', 'question_image', 'audio_file', 'option_1', 'option_2', 'option_3', 'option_4', 'option_5');
         }])
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('exam_id', $exam_group->exam->id)
+            ->where('exam_session_id', $exam_group->exam_session->id)
             ->orderBy('question_order', 'ASC')
             ->get();
 
-        //count all question answered berdasarkan tipe soal
         $question_answered = Answer::with('question')
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('exam_id', $exam_group->exam->id)
+            ->where('exam_session_id', $exam_group->exam_session->id)
             ->where(function ($query) {
                 $query->where(function ($q) {
-                    // Single choice: answer != 0
                     $q->whereHas('question', function ($qq) {
                         $qq->where('question_type', 'single');
                     })->where('answer', '!=', 0);
                 })->orWhere(function ($q) {
-                    // Multiple choice: selected_answers not empty
                     $q->whereHas('question', function ($qq) {
                         $qq->where('question_type', 'multiple');
                     })->whereNotNull('selected_answers')
                         ->whereRaw("selected_answers != '[]'");
                 })->orWhere(function ($q) {
-                    // Essay: essay_answer not empty
                     $q->whereHas('question', function ($qq) {
                         $qq->where('question_type', 'essay');
                     })->whereNotNull('essay_answer')
@@ -181,29 +177,26 @@ class ExamController extends Controller
             })
             ->count();
 
-        //get question active
         $question_active = Answer::with(['question' => function ($query) {
             $query->with('exam');
         }])
             ->where('student_id', auth()->guard('student')->user()->id)
             ->where('exam_id', $exam_group->exam->id)
+            ->where('exam_session_id', $exam_group->exam_session->id)
             ->where('question_order', $page)
             ->first();
 
-        //explode atau pecah jawaban (hanya untuk single dan multiple choice)
         if ($question_active && in_array($question_active->question->question_type, ['single', 'multiple'])) {
             $answer_order = explode(",", $question_active->answer_order);
         } else {
             $answer_order = [];
         }
 
-        //get duration
         $duration = Grade::where('exam_id', $exam_group->exam->id)
             ->where('exam_session_id', $exam_group->exam_session->id)
             ->where('student_id', auth()->guard('student')->user()->id)
             ->first();
 
-        //return with inertia
         return inertia('Student/Exams/Show', [
             'id'                => (int) $id,
             'page'              => (int) $page,
@@ -378,7 +371,7 @@ class ExamController extends Controller
         }
 
         // Calculate final grade (score out of 100)
-        $grade_exam = ($count_question > 0) ? round(($total_score / $count_question) * 100, 2) : 0;
+        $grade_exam = ($count_question > 0) ? round(($total_score / $count_question) * 250, 2) : 0;
 
         // Update grade in the database
         $grade = Grade::where('exam_id', $request->exam_id)
@@ -398,7 +391,7 @@ class ExamController extends Controller
         $exam_group = ExamGroup::with('exam.lesson')->find($request->exam_group_id);
 
         // Get KKM from lesson
-        $kkm = $exam_group->exam->lesson->kkm;
+        $kkm = 200;
 
         // Enhanced message with partial correct info
         $message = "*Hasil Ujian*\n\n"
@@ -502,7 +495,7 @@ class ExamController extends Controller
             $student_id = auth()->guard('student')->user()->id;
         }
 
-      
+
         $exam_history = ExamGroup::with([
             'exam.lesson',
             'exam_session',
@@ -515,20 +508,20 @@ class ExamController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($exam_group) use ($student_id) {
-         
+
                 $grade = Grade::where('exam_id', $exam_group->exam->id)
                     ->where('exam_session_id', $exam_group->exam_session->id)
                     ->where('student_id', $student_id)
                     ->first();
 
-            
+
                 $answers = Answer::with('question')
                     ->where('exam_id', $exam_group->exam->id)
                     ->where('exam_session_id', $exam_group->exam_session->id)
                     ->where('student_id', $student_id)
                     ->get();
 
-               
+
                 $stats = [
                     'total_questions' => $answers->count(),
                     'single_choice' => [
@@ -550,7 +543,7 @@ class ExamController extends Controller
                     ]
                 ];
 
-      
+
                 $status = 'not_started';
                 if ($grade) {
                     if ($grade->end_time) {
@@ -560,7 +553,7 @@ class ExamController extends Controller
                     }
                 }
 
-                
+
                 $duration_taken = null;
                 if ($grade && $grade->start_time && $grade->end_time) {
                     $start = Carbon::parse($grade->start_time);

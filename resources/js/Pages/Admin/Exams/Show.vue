@@ -65,10 +65,8 @@
                                     <tr v-for="(question, index) in exam.questions.data" :key="index">
                                         <td class="fw-bold text-center">{{ ++index + (exam.questions.current_page - 1) * exam.questions.per_page }}</td>
                                         <td>
-                                            <!-- Question with media handling (if present) -->
                                             <div class="fw-bold" v-html="question.question"></div>
                                             
-                                            <!-- Display media if available -->
                                             <div v-if="question.media_type === 'image' && question.question_image" class="mt-2 mb-2">
                                                 <img :src="`/storage/questions/${question.question_image}`" class="img-fluid" style="max-height: 200px;" alt="Question Image">
                                             </div>
@@ -81,21 +79,34 @@
                                             
                                             <hr>
                                             
-                                            <!-- For single and multiple choice questions -->
                                             <ol v-if="question.question_type === 'single' || question.question_type === 'multiple'" type="A">
-                                                <li v-if="question.option_1" v-html="question.option_1" 
-                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 1 || (question.question_type === 'multiple' && question.answers && question.answers.includes('1')) }"></li>
-                                                <li v-if="question.option_2" v-html="question.option_2" 
-                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 2 || (question.question_type === 'multiple' && question.answers && question.answers.includes('2')) }"></li>
-                                                <li v-if="question.option_3" v-html="question.option_3" 
-                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 3 || (question.question_type === 'multiple' && question.answers && question.answers.includes('3')) }"></li>
-                                                <li v-if="question.option_4" v-html="question.option_4" 
-                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 4 || (question.question_type === 'multiple' && question.answers && question.answers.includes('4')) }"></li>
-                                                <li v-if="question.option_5" v-html="question.option_5" 
-                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 5 || (question.question_type === 'multiple' && question.answers && question.answers.includes('5')) }"></li>
+                                                <li v-if="question.option_1" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 1 || (question.question_type === 'multiple' && question.answers && question.answers.includes('1')) }">
+                                                    <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_1}`" class="img-fluid" style="max-height: 150px;" alt="Option 1">
+                                                    <span v-else v-html="question.option_1"></span>
+                                                </li>
+                                                <li v-if="question.option_2" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 2 || (question.question_type === 'multiple' && question.answers && question.answers.includes('2')) }">
+                                                    <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_2}`" class="img-fluid" style="max-height: 150px;" alt="Option 2">
+                                                    <span v-else v-html="question.option_2"></span>
+                                                </li>
+                                                <li v-if="question.option_3" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 3 || (question.question_type === 'multiple' && question.answers && question.answers.includes('3')) }">
+                                                    <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_3}`" class="img-fluid" style="max-height: 150px;" alt="Option 3">
+                                                    <span v-else v-html="question.option_3"></span>
+                                                </li>
+                                                <li v-if="question.option_4" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 4 || (question.question_type === 'multiple' && question.answers && question.answers.includes('4')) }">
+                                                    <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_4}`" class="img-fluid" style="max-height: 150px;" alt="Option 4">
+                                                    <span v-else v-html="question.option_4"></span>
+                                                </li>
+                                                <li v-if="question.option_5" 
+                                                   :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 5 || (question.question_type === 'multiple' && question.answers && question.answers.includes('5')) }">
+                                                    <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_5}`" class="img-fluid" style="max-height: 150px;" alt="Option 5">
+                                                    <span v-else v-html="question.option_5"></span>
+                                                </li>
                                             </ol>
                                             
-                                            <!-- For essay questions -->
                                             <div v-if="question.question_type === 'essay'" class="mt-3">
                                                 <div class="alert alert-info">
                                                     <strong>Kunci Jawaban Essay:</strong>
@@ -127,46 +138,27 @@
 </template>
 
 <script>
-    //import layout
     import LayoutAdmin from '../../../Layouts/Admin.vue';
-
-    //import component pagination
     import Pagination from '../../../Components/Pagination.vue';
-
-    //import Heade and Link from Inertia
     import {
         Head,
         Link
     } from '@inertiajs/inertia-vue3';
-
-    //import inertia adapter
     import { Inertia } from '@inertiajs/inertia';
-
-    //import sweet alert2
     import Swal from 'sweetalert2';
 
     export default {
-
-        //layout
         layout: LayoutAdmin,
-
-        //register components
         components: {
             Head,
             Link,
             Pagination
         },
-
-        //props
         props: {
             errors: Object,
             exam: Object,
         },
-
-        //inisialisasi composition API
         setup() {
-
-            //define method destroy
             const destroy = (exam_id, question_id) => {
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -179,9 +171,7 @@
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
-
                         Inertia.delete(`/admin/exams/${exam_id}/questions/${question_id}/destroy`);
-
                         Swal.fire({
                             title: 'Deleted!',
                             text: 'Soal Ujian Berhasil Dihapus!.',
@@ -193,17 +183,12 @@
                 })
             }
 
-            //return
             return {
                 destroy,
             }
-
         }
-
     }
-
 </script>
 
 <style>
-
 </style>
