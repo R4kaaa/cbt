@@ -21,7 +21,7 @@ class LoginController extends Controller
             'phone' => 'required',
             'password'  => 'required',
         ]);
-        dd($request->all());
+        // dd($request->all());
         //cek phone dan password
         $student = Student::where([
             'phone'      => $request->phone,
