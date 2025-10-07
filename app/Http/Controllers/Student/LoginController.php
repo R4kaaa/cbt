@@ -21,13 +21,13 @@ class LoginController extends Controller
             'phone' => 'required',
             'password'  => 'required',
         ]);
-        dd($request->phone);
+        // dd($request->phone);
         //cek phone dan password
         $student = Student::where([
             'phone'      => $request->phone,
             'password'  => $request->password
         ])->first();
-        dd($student);
+        // dd($student);
         if (!$student) {
             return redirect()->back()->with('error', 'Nomor Telepon atau Password salah');
         }
