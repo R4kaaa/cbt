@@ -113,7 +113,7 @@ class StudentController extends Controller
         //validate request
         $request->validate([
             'name'          => 'required|string|max:255',
-            'nisn'          => 'required|size:16|unique:students,nisn,' . $student->id,
+            'nisn'          => 'required|unique:students,nisn,' . $student->id,
             'email'         => 'nullable|email|unique:students,email,' . $student->id,
             'phone'         => 'nullable|string|max:20',
             'gender'        => 'required|string',
