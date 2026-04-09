@@ -65,7 +65,7 @@
                                     <tr v-for="(question, index) in exam.questions.data" :key="index">
                                         <td class="fw-bold text-center">{{ ++index + (exam.questions.current_page - 1) * exam.questions.per_page }}</td>
                                         <td>
-                                            <div class="fw-bold" v-html="question.question"></div>
+                                            <div class="fw-bold plain-text-content">{{ question.question }}</div>
                                             
                                             <div v-if="question.media_type === 'image' && question.question_image" class="mt-2 mb-2">
                                                 <img :src="`/storage/questions/${question.question_image}`" class="img-fluid" style="max-height: 200px;" alt="Question Image">
@@ -83,34 +83,34 @@
                                                 <li v-if="question.option_1" 
                                                    :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 1 || (question.question_type === 'multiple' && question.answers && question.answers.includes('1')) }">
                                                     <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_1}`" class="img-fluid" style="max-height: 150px;" alt="Option 1">
-                                                    <span v-else v-html="question.option_1"></span>
+                                                    <span v-else class="plain-text-content">{{ question.option_1 }}</span>
                                                 </li>
                                                 <li v-if="question.option_2" 
                                                    :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 2 || (question.question_type === 'multiple' && question.answers && question.answers.includes('2')) }">
                                                     <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_2}`" class="img-fluid" style="max-height: 150px;" alt="Option 2">
-                                                    <span v-else v-html="question.option_2"></span>
+                                                    <span v-else class="plain-text-content">{{ question.option_2 }}</span>
                                                 </li>
                                                 <li v-if="question.option_3" 
                                                    :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 3 || (question.question_type === 'multiple' && question.answers && question.answers.includes('3')) }">
                                                     <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_3}`" class="img-fluid" style="max-height: 150px;" alt="Option 3">
-                                                    <span v-else v-html="question.option_3"></span>
+                                                    <span v-else class="plain-text-content">{{ question.option_3 }}</span>
                                                 </li>
                                                 <li v-if="question.option_4" 
                                                    :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 4 || (question.question_type === 'multiple' && question.answers && question.answers.includes('4')) }">
                                                     <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_4}`" class="img-fluid" style="max-height: 150px;" alt="Option 4">
-                                                    <span v-else v-html="question.option_4"></span>
+                                                    <span v-else class="plain-text-content">{{ question.option_4 }}</span>
                                                 </li>
                                                 <li v-if="question.option_5" 
                                                    :class="{ 'text-success fw-bold': question.question_type === 'single' && question.answer === 5 || (question.question_type === 'multiple' && question.answers && question.answers.includes('5')) }">
                                                     <img v-if="question.option_type === 'image'" :src="`/storage/questions/options/${question.option_5}`" class="img-fluid" style="max-height: 150px;" alt="Option 5">
-                                                    <span v-else v-html="question.option_5"></span>
+                                                    <span v-else class="plain-text-content">{{ question.option_5 }}</span>
                                                 </li>
                                             </ol>
                                             
                                             <div v-if="question.question_type === 'essay'" class="mt-3">
                                                 <div class="alert alert-info">
                                                     <strong>Kunci Jawaban Essay:</strong>
-                                                    <div class="mt-2" v-html="question.essay_answer"></div>
+                                                    <div class="mt-2 plain-text-content">{{ question.essay_answer }}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -191,4 +191,8 @@
 </script>
 
 <style>
+.plain-text-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
 </style>

@@ -53,12 +53,8 @@
 
                             <div class="mb-4">
                                 <label>Deskripsi</label>
-                                <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                    v-model="form.description" :init="{
-                                        menubar: false,
-                                        plugins: 'lists link image emoticons',
-                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                    }" />
+                                <TransliteratingTextarea v-model="form.description" input-id="exam-description"
+                                    :rows="6" placeholder="Masukkan deskripsi ujian" />
                                 <div v-if="errors.description" class="alert alert-danger mt-2">
                                     {{ errors.description }}
                                 </div>
@@ -145,8 +141,7 @@ import { Inertia } from '@inertiajs/inertia';
 //import sweet alert2
 import Swal from 'sweetalert2';
 
-//import tinyMCE
-import Editor from '@tinymce/tinymce-vue';
+import TransliteratingTextarea from '../../../Components/TransliteratingTextarea.vue';
 
 export default {
 
@@ -157,7 +152,7 @@ export default {
     components: {
         Head,
         Link,
-        Editor
+        TransliteratingTextarea
     },
 
     //props

@@ -171,7 +171,7 @@
                                     <!-- Question -->
                                     <div class="mb-3">
                                         <h6 class="fw-bold mb-2">Pertanyaan:</h6>
-                                        <div v-html="answer.question.question" class="question-content"></div>
+                                        <div class="question-content plain-text-content">{{ answer.question.question }}</div>
 
                                         <!-- Question Media -->
                                         <div v-if="answer.question.question_image" class="mt-2">
@@ -262,14 +262,14 @@
                                         <h6 class="fw-bold mb-2">Jawaban Siswa:</h6>
                                         <div class="card bg-light border-0 mb-3">
                                             <div class="card-body">
-                                                <p class="mb-0">{{ cleanEssayAnswer(answer.essay_answer) }}</p>
+                                                <p class="mb-0 plain-text-content">{{ cleanEssayAnswer(answer.essay_answer) }}</p>
                                             </div>
                                         </div>
 
                                         <h6 class="fw-bold mb-2">Jawaban yang Diharapkan:</h6>
                                         <div class="card bg-success bg-opacity-10 border-success border-opacity-25">
                                             <div class="card-body">
-                                                <p class="mb-0">{{ cleanHtmlTags(answer.question.essay_answer) }}</p>
+                                                <p class="mb-0 plain-text-content">{{ cleanHtmlTags(answer.question.essay_answer) }}</p>
                                             </div>
                                         </div>
 
@@ -414,8 +414,11 @@ export default {
         },
         cleanHtmlTags(htmlString) {
             if (!htmlString) return '';
-            // Menghilangkan semua HTML tags
-            return htmlString.replace(/<\/?p[^>]*>/g, '');
+            return htmlString
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/p>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
+                .trim();
 
         },
         getOptionClass(answer, optionNumber) {
@@ -455,6 +458,11 @@ export default {
     padding: 15px;
     border-radius: 8px;
     border-left: 4px solid #007bff;
+}
+
+.plain-text-content {
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .card.border-left-primary {

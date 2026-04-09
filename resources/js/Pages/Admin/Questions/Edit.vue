@@ -112,12 +112,9 @@
                                         <tr>
                                             <td style="width:20%" class="fw-bold">Soal</td>
                                             <td>
-                                                <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                    v-model="form.question" :init="{
-                                                        menubar: false,
-                                                        plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }" />
+                                                <TransliteratingTextarea v-model="form.question"
+                                                    input-id="question-text" :rows="6"
+                                                    placeholder="Masukkan isi soal" />
                                                 <div v-if="errors.question" class="mt-2 text-danger">
                                                     {{ errors.question }}
                                                 </div>
@@ -154,14 +151,9 @@
                                                 <td style="width:20%" class="fw-bold">Pilihan A</td>
                                                 <td>
                                                     <div v-if="form.option_type === 'text'">
-                                                        <Editor
-                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                            v-model="form.option_1" :init="{
-                                                                height: 130,
-                                                                menubar: false,
-                                                                plugins: 'lists link image emoticons',
-                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                            }" />
+                                                        <TransliteratingTextarea v-model="form.option_1"
+                                                            input-id="option-1-text" :rows="4"
+                                                            placeholder="Masukkan pilihan A" />
                                                     </div>
                                                     <div v-else>
                                                         <input type="file" class="form-control"
@@ -188,14 +180,9 @@
                                                 <td style="width:20%" class="fw-bold">Pilihan B</td>
                                                 <td>
                                                     <div v-if="form.option_type === 'text'">
-                                                        <Editor
-                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                            v-model="form.option_2" :init="{
-                                                                height: 130,
-                                                                menubar: false,
-                                                                plugins: 'lists link image emoticons',
-                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                            }" />
+                                                        <TransliteratingTextarea v-model="form.option_2"
+                                                            input-id="option-2-text" :rows="4"
+                                                            placeholder="Masukkan pilihan B" />
                                                     </div>
                                                     <div v-else>
                                                         <input type="file" class="form-control"
@@ -222,14 +209,9 @@
                                                 <td style="width:20%" class="fw-bold">Pilihan C</td>
                                                 <td>
                                                     <div v-if="form.option_type === 'text'">
-                                                        <Editor
-                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                            v-model="form.option_3" :init="{
-                                                                height: 130,
-                                                                menubar: false,
-                                                                plugins: 'lists link image emoticons',
-                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                            }" />
+                                                        <TransliteratingTextarea v-model="form.option_3"
+                                                            input-id="option-3-text" :rows="4"
+                                                            placeholder="Masukkan pilihan C" />
                                                     </div>
                                                     <div v-else>
                                                         <input type="file" class="form-control"
@@ -256,14 +238,9 @@
                                                 <td style="width:20%" class="fw-bold">Pilihan D</td>
                                                 <td>
                                                     <div v-if="form.option_type === 'text'">
-                                                        <Editor
-                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                            v-model="form.option_4" :init="{
-                                                                height: 130,
-                                                                menubar: false,
-                                                                plugins: 'lists link image emoticons',
-                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                            }" />
+                                                        <TransliteratingTextarea v-model="form.option_4"
+                                                            input-id="option-4-text" :rows="4"
+                                                            placeholder="Masukkan pilihan D" />
                                                     </div>
                                                     <div v-else>
                                                         <input type="file" class="form-control"
@@ -290,14 +267,9 @@
                                                 <td style="width:20%" class="fw-bold">Pilihan E</td>
                                                 <td>
                                                     <div v-if="form.option_type === 'text'">
-                                                        <Editor
-                                                            api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                            v-model="form.option_5" :init="{
-                                                                height: 130,
-                                                                menubar: false,
-                                                                plugins: 'lists link image emoticons',
-                                                                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                            }" />
+                                                        <TransliteratingTextarea v-model="form.option_5"
+                                                            input-id="option-5-text" :rows="4"
+                                                            placeholder="Masukkan pilihan E" />
                                                     </div>
                                                     <div v-else>
                                                         <input type="file" class="form-control"
@@ -382,13 +354,9 @@
                                         <tr v-if="form.question_type === 'essay'">
                                             <td style="width:20%" class="fw-bold">Kunci Jawaban Essay</td>
                                             <td>
-                                                <Editor api-key="f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr"
-                                                    v-model="form.essay_answer" :init="{
-                                                        height: 200,
-                                                        menubar: false,
-                                                        plugins: 'lists link image emoticons',
-                                                        toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
-                                                    }" />
+                                                <TransliteratingTextarea v-model="form.essay_answer"
+                                                    input-id="essay-answer-key" :rows="8"
+                                                    placeholder="Masukkan kunci jawaban atau panduan penilaian" />
                                                 <div v-if="errors.essay_answer" class="mt-2 text-danger">
                                                     {{ errors.essay_answer }}
                                                 </div>
@@ -416,14 +384,14 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 import { reactive, ref, watch } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
 import Swal from 'sweetalert2';
-import Editor from '@tinymce/tinymce-vue';
+import TransliteratingTextarea from '../../../Components/TransliteratingTextarea.vue';
 
 export default {
     layout: LayoutAdmin,
     components: {
         Head,
         Link,
-        Editor,
+        TransliteratingTextarea,
     },
     props: {
         errors: Object,

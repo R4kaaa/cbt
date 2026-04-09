@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
 
-                                <p v-html="question_active.question.question" class="fs-5"></p>
+                                <p class="fs-5 plain-text-content">{{ question_active.question.question }}</p>
 
                                 <div v-if="question_active.question.question_type === 'multiple'"
                                     class="alert alert-info">
@@ -87,8 +87,9 @@
                                                 :src="`/storage/questions/options/${question_active.question['option_' + answer]}`"
                                                 class="img-fluid rounded border" :alt="'Opsi ' + options[index]"
                                                 style="max-height: 200px; cursor: pointer;" />
-                                            <p v-else v-html="question_active.question['option_' + answer]"
-                                                class="mb-0"></p>
+                                            <p v-else class="mb-0 plain-text-content">
+                                                {{ question_active.question['option_' + answer] }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -116,8 +117,9 @@
                                                 :src="`/storage/questions/options/${question_active.question['option_' + answer]}`"
                                                 class="img-fluid rounded border" :alt="'Opsi ' + options[index]"
                                                 style="max-height: 200px; cursor: pointer;" />
-                                            <p v-else v-html="question_active.question['option_' + answer]"
-                                                class="mb-0"></p>
+                                            <p v-else class="mb-0 plain-text-content">
+                                                {{ question_active.question['option_' + answer] }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -138,8 +140,8 @@
                                         <i class="fa fa-pen me-2"></i>Jawaban Essay:
                                     </label>
 
-                                    <Editor :api-key="'f4g16s2kaw96ta82x5udni28fxmdk833fkdpwdduyrzb20gr'"
-                                        v-model="essayAnswer" :init="tinymceConfig" />
+                                    <TransliteratingTextarea v-model="essayAnswer" input-id="essay-answer"
+                                        :rows="10" placeholder="Tulis jawaban essay di sini..." />
 
                                     <div class="d-flex justify-content-end mt-2">
                                         <div class="character-count text-muted">
@@ -301,7 +303,7 @@
 
 <script>
 import LayoutStudent from '../../../Layouts/Student.vue';
-import Editor from '@tinymce/tinymce-vue';
+import TransliteratingTextarea from '../../../Components/TransliteratingTextarea.vue';
 import { Head, Link } from '@inertiajs/inertia-vue3';
 import { ref, onMounted, watch } from 'vue';
 import VueCountdown from '@chenfengyuan/vue-countdown';
@@ -315,7 +317,7 @@ export default {
         Head,
         Link,
         VueCountdown,
-        Editor
+        TransliteratingTextarea
     },
     props: {
         id: Number,
@@ -329,18 +331,6 @@ export default {
     },
     setup(props) {
         let options = ["A", "B", "C", "D", "E"];
-
-        const tinymceConfig = {
-            height: 300,
-            menubar: false,
-            plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'preview', 'help', 'wordcount'
-            ],
-            toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }'
-        };
 
         const counter = ref(0);
         const duration = ref(props.duration.duration);
@@ -613,8 +603,7 @@ export default {
             submitEssayAnswer,
             getQuestionTypeLabel,
             getQuestionTypeBadgeClass,
-            getQuestionTypeButtonClass,
-            tinymceConfig
+            getQuestionTypeButtonClass
         }
     }
 }
@@ -654,6 +643,11 @@ export default {
 
 .option-content img {
     transition: transform 0.2s;
+}
+
+.plain-text-content {
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .option-content:hover img {

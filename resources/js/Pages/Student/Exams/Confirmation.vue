@@ -21,7 +21,7 @@
                         <h5 class="mb-0"> <i class="fa fa-file me-2"></i> Deskripsi Ujian</h5>
                     </div>
                     <div class="card-body">
-                        <div v-html="exam_group.exam.description" class="exam-description"></div>
+                        <div class="exam-description plain-text-content">{{ exam_group.exam.description }}</div>
                     </div>
                 </div>
             </div>
@@ -114,5 +114,10 @@ export default {
 <style>
 .exam-description {
     min-height: 200px;
+}
+
+.plain-text-content {
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 </style>
