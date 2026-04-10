@@ -1,0 +1,33 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<table border="1">
+    <tr>
+        <th>nik</th>
+        <th>name</th>
+        <th>email</th>
+        <th>phone</th>
+        <th>password</th>
+        <th>gender</th>
+    </tr>
+    <tr>
+        <td>1234567890123456</td>
+        <td>Budi Santoso</td>
+        <td>budi@example.com</td>
+        <td>081234567890</td>
+        <td>password123</td>
+        <td>L</td>
+    </tr>
+    <tr>
+        <td>1234567890123457</td>
+        <td>Siti Aminah</td>
+        <td>siti@example.com</td>
+        <td>081234567891</td>
+        <td>password123</td>
+        <td>P</td>
+    </tr>
+</table>
+</body>
+</html>

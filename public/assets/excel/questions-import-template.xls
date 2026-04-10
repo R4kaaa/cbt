@@ -1,0 +1,36 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<table border="1">
+    <tr>
+        <th>question</th>
+        <th>option_1</th>
+        <th>option_2</th>
+        <th>option_3</th>
+        <th>option_4</th>
+        <th>option_5</th>
+        <th>answer</th>
+    </tr>
+    <tr>
+        <td>Ibukota Jepang adalah...</td>
+        <td>Osaka</td>
+        <td>Kyoto</td>
+        <td>Tokyo</td>
+        <td>Nagoya</td>
+        <td>Fukuoka</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>Huruf hiragana untuk bunyi a adalah...</td>
+        <td>i</td>
+        <td>u</td>
+        <td>a</td>
+        <td>e</td>
+        <td>o</td>
+        <td>3</td>
+    </tr>
+</table>
+</body>
+</html>

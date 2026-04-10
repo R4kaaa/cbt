@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('/japanese-dictionary/suggest', [App\Http\Controllers\JapaneseDictionaryController::class, 'suggest'])
+    ->middleware('throttle:30,1')
+    ->name('japanese.dictionary.suggest');
+
 //prefix "admin"
 Route::prefix('admin')->group(function () {
 

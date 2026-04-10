@@ -18,6 +18,8 @@
         "@inertiajs/progress": "^0.2.7",
         "@vitejs/plugin-vue": "^3.0.1",
         "@vuepic/vue-datepicker": "^3.2.2",
+        "jquery": "^4.0.0",
+        "jquery.ime": "^0.2.0-2",
         "vue": "^3.2.29",
         "vue-sweetalert2": "^5.0.2",
         "wanakana": "^5.3.1"

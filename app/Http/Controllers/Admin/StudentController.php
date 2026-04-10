@@ -163,17 +163,20 @@ class StudentController extends Controller
 
     public function import()
     {
-        return inertia('Admin/Students/Import');
+        return inertia('Admin/Students/Import', [
+            'classrooms' => Classroom::orderBy('title')->get(),
+        ]);
     }
 
     public function storeImport(Request $request)
     {
         $this->validate($request, [
-            'file' => 'required|mimes:csv,xls,xlsx'
+            'file' => 'required|mimes:csv,xls,xlsx',
+            'classroom_id' => 'required|exists:classrooms,id',
         ]);
 
         // import data
-        Excel::import(new StudentsImport(), $request->file('file'));
+        Excel::import(new StudentsImport((int) $request->classroom_id), $request->file('file'));
 
         //redirect
         return redirect()->route('admin.students.index');

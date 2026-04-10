@@ -7,7 +7,7 @@
             <div class="col-md-12">
                 <Link href="/admin/students" class="btn btn-md btn-primary border-0 shadow mb-3 me-3" type="button"><i
                     class="fa fa-long-arrow-alt-left me-2"></i> Kembali</Link>
-                <a href="/assets/excel/students.xlsx" target="_blank"
+                <a href="/assets/excel/students-import-template.xls" target="_blank"
                     class="btn btn-md btn-success border-0 shadow mb-3 text-white" type="button"><i
                         class="fa fa-file-excel me-2"></i> Contoh Format</a>
                 <div class="card border-0 shadow">
@@ -15,6 +15,23 @@
                         <h5><i class="fa fa-user"></i> Import Siswa</h5>
                         <hr>
                         <form @submit.prevent="submit">
+                            <div class="alert alert-info">
+                                Pilih kelas terlebih dahulu. File Excel tidak perlu lagi mengisi
+                                <strong>classroom_id</strong> karena relasi kelas akan diambil dari pilihan ini.
+                            </div>
+
+                            <div class="mb-4">
+                                <label>Kelas</label>
+                                <select class="form-select" v-model="form.classroom_id">
+                                    <option disabled value="">Pilih kelas</option>
+                                    <option v-for="classroom in classrooms" :key="classroom.id" :value="classroom.id">
+                                        {{ classroom.title }}
+                                    </option>
+                                </select>
+                                <div v-if="errors.classroom_id" class="alert alert-danger mt-2">
+                                    {{ errors.classroom_id }}
+                                </div>
+                            </div>
 
                             <div class="mb-4">
                                 <label>File Excel</label>
@@ -74,6 +91,7 @@
         //props
         props: {
             errors: Object,
+            classrooms: Array,
         },
 
         //inisialisasi composition API
@@ -82,6 +100,7 @@
             //define form with reactive
             const form = reactive({
                 file: '',
+                classroom_id: '',
             });
 
             //method "submit"
@@ -91,6 +110,7 @@
                 Inertia.post('/admin/students/import', {
                     //data
                     file: form.file,
+                    classroom_id: form.classroom_id,
                 }, {
                     onSuccess: () => {
                         //show success alert
